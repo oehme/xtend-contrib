@@ -78,11 +78,18 @@ class LoggingProcessor extends AbstractClassProcessor {
 		val annot = clazz.findAnnotation(findTypeGlobally(typeof(Logging)))
 		val Object value = annot.getValue("type")
 		if (value != null) {
-			val type = if (value instanceof String) {
-				LoggingType::valueOf(value as String)
+			val LoggingType type = if (value instanceof String) {
+				try {
+					LoggingType::valueOf(value as String)
+				} catch (IllegalArgumentException e) {
+					addError(clazz, "Valid arguments : " +LoggingType::values.toList)
+					null
+				}
 			} else if (value instanceof LoggingType) {
 				value as LoggingType
-			} else { ( null ) }
+			} else { 
+				null 
+			}
 			switch (type) {
 				case LoggingType::Log4J : new Log4j
 				case LoggingType::JavaUtilLogging : new JUL
@@ -93,6 +100,7 @@ class LoggingProcessor extends AbstractClassProcessor {
 			null
 		}
 	}
+	
 	
 	def LoggingSystem findAvailable(TransformationContext context) {
 		for (LoggingSystem ls : loggingSystems) {
