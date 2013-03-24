@@ -31,6 +31,9 @@ class LoggingProcessor extends AbstractClassProcessor {
 		addLogging(clazz, context, loggingSystem)
 		addDebugMethod(clazz, context, loggingSystem)
 		addInfoMethod(clazz, context, loggingSystem)
+		addWarnMethod(clazz, context, loggingSystem)
+		addErrorMethod(clazz, context, loggingSystem)
+		addErrorWithExceptionMethod(clazz, context, loggingSystem)
 	}
 	
 	def addDebugMethod(MutableClassDeclaration clazz, extension TransformationContext context, LoggingSystem system) {
@@ -59,6 +62,47 @@ class LoggingProcessor extends AbstractClassProcessor {
 			]
 		])
 	}
+	def addWarnMethod(MutableClassDeclaration clazz, extension TransformationContext context, LoggingSystem system) {
+		clazz.addMethod("warn", [
+			static = true
+			visibility = Visibility::PRIVATE 
+			addParameter("logStatement", typeof(Functions$Function0).newTypeReference(typeof(String).newTypeReference))
+			body = [ '''
+			   if (LOG.«system.warningCheck») {
+			   	  LOG.«system.getWarnCall("logStatement.apply()")»;
+			   }
+			'''
+			]
+		])
+	}
+	def addErrorMethod(MutableClassDeclaration clazz, extension TransformationContext context, LoggingSystem system) {
+		clazz.addMethod("error", [
+			static = true
+			visibility = Visibility::PRIVATE 
+			addParameter("logStatement", typeof(Functions$Function0).newTypeReference(typeof(String).newTypeReference))
+			body = [ '''
+			   if (LOG.«system.errorCheck») {
+			   	  LOG.«system.getErrorCall("logStatement.apply()")»;
+			   }
+			'''
+			]
+		])
+	}
+	def addErrorWithExceptionMethod(MutableClassDeclaration clazz, extension TransformationContext context, LoggingSystem system) {
+		clazz.addMethod("error", [
+			static = true
+			visibility = Visibility::PRIVATE 
+			addParameter("logStatement", typeof(Functions$Function0).newTypeReference(typeof(String).newTypeReference))
+			addParameter("throwable", typeof(Throwable).newTypeReference)
+			body = [ '''
+			   if (LOG.«system.errorCheck») {
+			   	  LOG.«system.getErrorCall("logStatement.apply(), throwable")»;
+			   }
+			'''
+			]
+		])
+	}
+	
 	
 	def addLogging(MutableClassDeclaration clazz, extension TransformationContext context, LoggingSystem system) {
 		if (system.isAvailable(context)) {
@@ -131,6 +175,18 @@ abstract class LoggingSystem {
 	def String getInfoCall(String parameters) {
 		return "info("+parameters+")"
 	}
+	
+	def abstract String getWarningCheck()
+	
+	def String getWarnCall(String parameters) {
+		return "warn("+parameters+")"
+	}
+	
+	def abstract String getErrorCheck()
+	
+	def String getErrorCall(String parameters) {
+		return "error("+parameters+")"
+	}
 
 }
 
@@ -160,8 +216,24 @@ class JUL extends LoggingSystem {
 		"isLoggable(java.util.logging.Level.INFO)"
 	}
 	
+	override getWarningCheck() {
+		"isLoggable(java.util.logging.Level.WARNING)"
+	}
+	
+	override getErrorCheck() {
+		"isLoggable(java.util.logging.Level.SEVERE)"
+	}
+	
 	override getDebugCall(String parameters) {
 		"log(java.util.logging.Level.FINE,"+parameters+")"
+	}
+
+	override getWarnCall(String parameters) {
+		"warning("+parameters+")"
+	}
+
+	override getErrorCall(String parameters) {
+		"log(java.util.logging.Level.SEVERE,"+parameters+")"
 	}
 	
 }
@@ -181,9 +253,13 @@ abstract class ExternalLogging extends LoggingSystem {
 		findTypeGlobally(className) != null
 	}
 
-	override def String getDebugCheck() { "isDebugEnabled()" }
+	override getDebugCheck() { "isDebugEnabled()" }
 	
-	override String getInfoCheck() { "isInfoEnabled()" }
+	override getInfoCheck() { "isInfoEnabled()" }
+	
+	override getWarningCheck() { "isWarnEnabled()" }
+	
+	override getErrorCheck() { "isErrorEnabled()" }
 
 }
 
@@ -200,6 +276,15 @@ class Log4j extends ExternalLogging {
 	override initMethod() {
 		"Logger.getLogger"
 	}
+	
+	override getErrorCheck() {
+		"isEnabledFor(org.apache.log4j.Level.ERROR)"
+	}
+	
+	override getWarningCheck() {
+		"isEnabledFor(org.apache.log4j.Level.WARN)"
+	}
+	
 }
 
 class Slf4j extends ExternalLogging {
