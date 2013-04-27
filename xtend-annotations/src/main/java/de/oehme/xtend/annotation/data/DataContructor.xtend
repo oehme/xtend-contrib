@@ -10,22 +10,25 @@ import org.eclipse.xtend.lib.macro.declaration.Visibility
 /**
  * Usage:
  * <pre>
- * class Dto {
- *   @DataConstructor 
- *   new(String name, int age){
- *   }
+ * class Person {
+ *  @DataConstructor
+ *  new(String name, int age) {
+ *      println("Person created");
+ *  }
  * }
  * </pre>
  * This is equivalent to:
  * <pre>
- * class Dto {
- *   val name;
- *   val age;
- *   new(String name, int age){
- *     this.name=name
- *     this.age=age
- *   }
- * } 
+ * class Person {
+ *     public final String name;
+ *     public final int age;
+ * 
+ *     new(String name, int age) {
+ *         this.name = name
+ *         this.age = age
+ *         println("Person created");
+ *     }
+ * }
  * </pre>
  */
 @Active(typeof(DataContructorProcessor))
