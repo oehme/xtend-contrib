@@ -7,4 +7,11 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>xtend-annotations</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.xtend</groupId>
+			<artifactId>org.eclipse.xtend.standalone</artifactId>
+			<version>2.4.1</version>
+		</dependency>
+	</dependencies>
 </project>
