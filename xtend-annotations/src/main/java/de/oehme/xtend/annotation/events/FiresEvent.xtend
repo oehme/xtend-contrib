@@ -11,7 +11,7 @@ import java.lang.annotation.Target
 import java.lang.annotation.ElementType
 
 /**
- * Generates methods for registering listeners and notifing them.
+ * Generates methods for registering listeners and notifying them.
  * 
  * <pre>
  * @FiresEvent(typeof(ChangeListener))
