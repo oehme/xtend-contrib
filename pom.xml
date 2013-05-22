@@ -13,6 +13,7 @@
 
 	<properties>
 		<github.location>xtend-annotations</github.location>
+		<xtend.version>2.4.2-SNAPSHOT</xtend.version>
 	</properties>
 	<dependencies>
 		<dependency>
