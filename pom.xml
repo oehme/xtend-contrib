@@ -11,8 +11,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<scm>
+		<connection>scm:git:git://github.com/oehme/xtend-annotations.git</connection>
+		<developerConnection>scm:git:git@github.com:oehme/xtend-annotations.git</developerConnection>
+		<url>https://github.com/oehme/xtend-annotations</url>
+	</scm>
+
 	<properties>
-		<github.location>xtend-annotations</github.location>
 		<xtend.version>2.4.2-SNAPSHOT</xtend.version>
 	</properties>
 	<dependencies>
