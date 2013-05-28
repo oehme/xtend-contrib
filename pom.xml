@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.oehme</groupId>
 		<artifactId>oss-java-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1-SNAPSHOT</version>
 	</parent>
 
 	<groupId>de.oehme.xtend.annotations</groupId>
