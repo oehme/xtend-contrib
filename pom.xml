@@ -6,6 +6,7 @@
 		<artifactId>oss-java-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
+
 	<groupId>de.oehme.xtend.annotations</groupId>
 	<artifactId>xtend-annotations-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -17,9 +18,44 @@
 		<url>https://github.com/oehme/xtend-annotations</url>
 	</scm>
 
+	<developers>
+		<developer>
+			<id>oehme</id>
+			<name>Stefan Oehme</name>
+			<email>oehme@itemis.de</email>
+			<url>https://plus.google.com/102844322322705636353</url>
+			<organization>itemis AG</organization>
+			<organizationUrl>itemis.de</organizationUrl>
+		</developer>
+	</developers>
+
+	<ciManagement>
+		<url>https://oehme.ci.cloudbees.com/</url>
+		<system>jenkins</system>
+	</ciManagement>
+
+	<issueManagement>
+		<system>Github Issues</system>
+		<url>https://github.com/oehme/xtend-annotation/issues</url>
+	</issueManagement>
+
+	<licenses>
+		<license>
+			<name>MIT</name>
+			<distribution>repo</distribution>
+			<url>http://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>itemis AG</name>
+		<url>itemis.de</url>
+	</organization>
+
 	<properties>
 		<xtend.version>2.4.2-SNAPSHOT</xtend.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.eclipse.xtend</groupId>
