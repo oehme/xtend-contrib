@@ -4,13 +4,14 @@
 	<parent>
 		<groupId>de.oehme</groupId>
 		<artifactId>oss-java-parent</artifactId>
-		<version>1-SNAPSHOT</version>
+		<version>2</version>
 	</parent>
 
 	<groupId>de.oehme.xtend.annotations</groupId>
 	<artifactId>xtend-annotations-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	<inceptionYear>2013</inceptionYear>
 
 	<scm>
 		<connection>scm:git:git://github.com/oehme/xtend-annotations.git</connection>
