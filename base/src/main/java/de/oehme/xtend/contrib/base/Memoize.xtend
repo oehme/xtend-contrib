@@ -9,6 +9,8 @@ import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeReference
 import org.eclipse.xtend.lib.macro.declaration.Visibility
 import org.eclipse.xtext.xbase.lib.Exceptions
+import com.google.common.base.Objects
+import java.util.Arrays
 
 /**
  * Memoizes invocations of a method. When the method is called multiple times with the same parameters, a cached result will be returned.
@@ -195,7 +197,7 @@ class MultipleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
 	override protected cacheKeyToParameters(extension CompilationContext context) {
 		(method.parameters).join("", ",", "")[
 			'''
-				(«type.wrapperIfPrimitive.toJavaCode») key.getParameters()[«method.parameters.indexOf(it)»]
+				(«type.wrapperIfPrimitive.toJavaCode») key.get(«method.parameters.indexOf(it)»)
 			''']
 	}
 
@@ -212,11 +214,25 @@ class MultipleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
  * This class is an implementation detail and not fit for general use.
  * It foregoes immutability for pure performance
  */
-@Data
 class CacheKey {
 	val Object[] parameters
 
 	new(Object... parameters) {
-		this._parameters = parameters
+		this.parameters = parameters
+	}
+
+	def Object get(int index) {
+		parameters.get(index)
+	}
+
+	override equals(Object obj) {
+		if (obj instanceof CacheKey) {
+			Arrays::equals(parameters, (obj as CacheKey).parameters)
+		}
+		false
+	}
+
+	override hashCode() {
+		Arrays::hashCode(parameters)
 	}
 }

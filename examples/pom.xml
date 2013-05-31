@@ -18,5 +18,22 @@
 			<artifactId>xtend-contrib-caliper</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>de.oehme.xtend.contrib</groupId>
+			<artifactId>xtend-contrib-beanio</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.oehme.xtend.contrib</groupId>
+			<artifactId>xtend-contrib-swing</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.xtend</groupId>
+			<artifactId>org.eclipse.xtend.standalone</artifactId>
+			<!-- TODO File a bug, this shouldnt be necessary for writing annotation
+				procesors -->
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 </project>

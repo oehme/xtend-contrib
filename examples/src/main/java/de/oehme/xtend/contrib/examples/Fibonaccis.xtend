@@ -31,4 +31,9 @@ class Fibonaccis {
 		}
 		x
 	}
+
+	@Memoize
+	def foo(String a, Integer b) {
+		a + b
+	}
 }
