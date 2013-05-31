@@ -7,16 +7,21 @@
 		<version>2</version>
 	</parent>
 
-	<groupId>de.oehme.xtend.annotations</groupId>
-	<artifactId>xtend-annotations-parent</artifactId>
+	<groupId>de.oehme.xtend.contrib</groupId>
+	<artifactId>xtend-contrib-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2013</inceptionYear>
+	<name>Xtend Contrib</name>
+	<description>
+		A collection of Xtend extension methods and active annotations
+		that make working with popular libraries even more fun.
+	</description>
 
 	<scm>
-		<connection>scm:git:git://github.com/oehme/xtend-annotations.git</connection>
-		<developerConnection>scm:git:git@github.com:oehme/xtend-annotations.git</developerConnection>
-		<url>https://github.com/oehme/xtend-annotations</url>
+		<connection>scm:git:git://github.com/oehme/xtend-contrib.git</connection>
+		<developerConnection>scm:git:git@github.com:oehme/xtend-contrib.git</developerConnection>
+		<url>https://github.com/oehme/xtend-contrib</url>
 	</scm>
 
 	<developers>
@@ -37,7 +42,7 @@
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/oehme/xtend-annotation/issues</url>
+		<url>https://github.com/oehme/xtend-contrib/issues</url>
 	</issueManagement>
 
 	<licenses>
@@ -63,13 +68,16 @@
 			<artifactId>org.eclipse.xtend.lib</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
+			<groupId>org.eclipse.xtend</groupId>
+			<artifactId>org.eclipse.xtend.standalone</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.google.caliper</groupId>
-			<artifactId>caliper</artifactId>
-			<version>0.5-rc1</version>
+			<groupId>org.jnario</groupId>
+			<artifactId>org.jnario.lib.maven</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -78,6 +86,10 @@
 			<plugin>
 				<groupId>org.eclipse.xtend</groupId>
 				<artifactId>xtend-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.jnario</groupId>
+				<artifactId>jnario-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -95,8 +107,8 @@
 	</build>
 
 	<modules>
-		<module>xtend-annotations</module>
-		<module>xtend-annotations-example</module>
-		<module>xtend-annotations-test</module>
+		<module>base</module>
+		<module>caliper</module>
+		<module>examples</module>
 	</modules>
 </project>
