@@ -22,7 +22,7 @@ class ImmutableProcessor extends AbstractClassProcessor {
 		if(cls.extendedClass != object) cls.addError("Inheritance does not play well with immutability")
 		cls.final = true
 
-		val builder = cls.builderClass(context)=> [
+		val builder = cls.builderClass(context) => [
 			final = true
 			addMethod("build") [
 				returnType = cls.newTypeReference
@@ -111,7 +111,14 @@ class ImmutableProcessor extends AbstractClassProcessor {
 		]
 		cls.addMethod("toString") [
 			returnType = string
-			body = ['''return new org.eclipse.xtext.xbase.lib.util.ToStringHelper().toString(this);''']
+			body = [
+				'''
+					return «objects».toStringHelper(«cls.simpleName».class)
+					«FOR a : cls.declaredFields»
+						.add("«a.simpleName»",«a.simpleName»)
+					«ENDFOR»
+					.toString();
+				''']
 		]
 	}
 
