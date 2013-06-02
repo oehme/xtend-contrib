@@ -1,6 +1,7 @@
-package de.oehme.xtend.contrib.examples
+package de.oehme.xtend.contrib.examples.caliper
 
 import de.oehme.xtend.contrib.caliper.Benchmark
+import de.oehme.xtend.contrib.examples.base.Fibonaccis
 import java.util.List
 
 @Benchmark

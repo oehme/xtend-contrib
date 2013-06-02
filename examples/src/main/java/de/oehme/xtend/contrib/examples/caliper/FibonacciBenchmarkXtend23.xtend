@@ -1,9 +1,10 @@
-package de.oehme.xtend.contrib.examples
+package de.oehme.xtend.contrib.examples.caliper
 
 import com.google.caliper.Param
 import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.common.collect.ImmutableList
+import de.oehme.xtend.contrib.examples.base.Fibonaccis
 
 class FibonacciBenchmarkXtend23 extends SimpleBenchmark {
 

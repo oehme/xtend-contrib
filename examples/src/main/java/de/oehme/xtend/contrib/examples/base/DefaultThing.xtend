@@ -1,4 +1,4 @@
-package de.oehme.xtend.contrib.examples
+package de.oehme.xtend.contrib.examples.base
 
 import de.oehme.xtend.contrib.base.ExtractInterface
 
