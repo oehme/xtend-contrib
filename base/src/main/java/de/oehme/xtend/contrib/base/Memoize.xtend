@@ -1,5 +1,6 @@
 package de.oehme.xtend.contrib.base
 
+import java.util.Arrays
 import java.util.List
 import org.eclipse.xtend.lib.macro.Active
 import org.eclipse.xtend.lib.macro.TransformationContext
@@ -7,10 +8,9 @@ import org.eclipse.xtend.lib.macro.TransformationParticipant
 import org.eclipse.xtend.lib.macro.declaration.CompilationStrategy$CompilationContext
 import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeReference
-import org.eclipse.xtend.lib.macro.declaration.Visibility
 import org.eclipse.xtext.xbase.lib.Exceptions
-import com.google.common.base.Objects
-import java.util.Arrays
+
+import static extension de.oehme.xtend.contrib.base.MacroExtensions.*
 
 /**
  * Memoizes invocations of a method. When the method is called multiple times with the same parameters, a cached result will be returned.
@@ -29,13 +29,14 @@ annotation Memoize {
 
 class MemoizeProcessor implements TransformationParticipant<MutableMethodDeclaration> {
 	override doTransform(List<? extends MutableMethodDeclaration> methods, extension TransformationContext context) {
-		methods.forEach [
+		for (i : 0 ..< methods.size) {
+			val it = methods.get(i)
 			switch (parameters.size) {
-				case 0: new ParamterlessMethodMemoizer(it, context, methods.indexOf(it)).generate
-				case 1: new SingleParameterMethodMemoizer(it, context, methods.indexOf(it)).generate
-				default: new MultipleParameterMethodMemoizer(it, context, methods.indexOf(it)).generate
+				case 0: new ParamterlessMethodMemoizer(it, context, i).generate
+				case 1: new SingleParameterMethodMemoizer(it, context, i).generate
+				default: new MultipleParameterMethodMemoizer(it, context, i).generate
 			}
-		]
+		}
 	}
 }
 
@@ -43,7 +44,7 @@ abstract class MethodMemoizer {
 
 	protected val extension TransformationContext context
 	protected val MutableMethodDeclaration method
-	val int index
+	protected val int index
 
 	new(MutableMethodDeclaration method, TransformationContext context, int index) {
 		this.method = method
@@ -52,34 +53,20 @@ abstract class MethodMemoizer {
 	}
 
 	def final generate() {
-		method.declaringType => [
-			addMethod(initMethodName) [ init |
-				init.static = method.static
-				init.visibility = Visibility::PRIVATE
-				init.returnType = wrappedReturnType
-				method.parameters.forEach[init.addParameter(simpleName, type)]
-				init.exceptions = method.exceptions
-				init.body = method.body
-			]
-			addField(cacheFieldName) [
-				static = method.static
-				type = cacheFieldType
-				initializer = [cacheFieldInit]
-			]
-		]
 		method => [
-			body = [cacheCall]
-			returnType = wrappedReturnType
+			returnType = returnType.wrapperIfPrimitive
+			addIndirection(initMethodName)[cacheCall]
+			declaringType => [
+				addField(cacheFieldName) [
+					static = method.static
+					type = cacheFieldType
+					initializer = [cacheFieldInit]
+				]
+			]
 		]
 	}
 
-	def protected final wrappedReturnType() {
-		method.returnType.wrapperIfPrimitive
-	}
-
-	def protected final initMethodName() {
-		method.simpleName + "_init"
-	}
+	def protected final String initMethodName() '''«method.simpleName»_init'''
 
 	def protected final String cacheFieldName() '''cache«index»_«method.simpleName»'''
 
@@ -111,7 +98,7 @@ class ParamterlessMethodMemoizer extends MethodMemoizer {
 	'''
 
 	override protected cacheFieldType() {
-		wrappedReturnType
+		method.returnType
 	}
 
 	override protected cacheFieldInit(CompilationContext context) '''null'''
@@ -131,9 +118,9 @@ abstract class ParametrizedMethodMemoizer extends MethodMemoizer {
 
 	override protected final cacheFieldInit(extension CompilationContext context) '''
 		com.google.common.cache.CacheBuilder.newBuilder()
-		.build(new com.google.common.cache.CacheLoader<«cacheKeyType.toJavaCode», «wrappedReturnType.toJavaCode»>() {
+		.build(new com.google.common.cache.CacheLoader<«cacheKeyType.toJavaCode», «method.returnType.toJavaCode»>() {
 			@Override
-			public «wrappedReturnType.toJavaCode» load(«cacheKeyType.toJavaCode» key) throws Exception {
+			public «method.returnType.toJavaCode» load(«cacheKeyType.toJavaCode» key) throws Exception {
 				return «initMethodName»(«cacheKeyToParameters(context)»);
 			}
 		})
@@ -143,7 +130,7 @@ abstract class ParametrizedMethodMemoizer extends MethodMemoizer {
 		newTypeReference(
 			"com.google.common.cache.LoadingCache",
 			cacheKeyType,
-			wrappedReturnType
+			method.returnType
 		)
 	}
 
@@ -195,7 +182,7 @@ class MultipleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
 	}
 
 	override protected cacheKeyToParameters(extension CompilationContext context) {
-		(method.parameters).join("", ",", "")[
+		method.parameters.join(",")[
 			'''
 				(«type.wrapperIfPrimitive.toJavaCode») key.get(«method.parameters.indexOf(it)»)
 			''']

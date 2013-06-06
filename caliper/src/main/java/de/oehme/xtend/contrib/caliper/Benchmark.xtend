@@ -6,10 +6,9 @@ import com.google.caliper.SimpleBenchmark
 import org.eclipse.xtend.lib.macro.Active
 import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
-import org.eclipse.xtend.lib.macro.declaration.MutableFieldDeclaration
-import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.Visibility
 import org.eclipse.xtend.lib.macro.AbstractClassProcessor
+import static extension de.oehme.xtend.contrib.base.MacroExtensions.*
 
 /**
  * <p>
@@ -107,7 +106,7 @@ class BenchmarkClassGenerator {
 				type = param.propertyType.actualTypeArguments.get(0)
 			]
 			param.visibility = Visibility::DEFAULT
-			param.makeStatic
+			param.static = true
 		]
 	}
 
@@ -127,21 +126,5 @@ class BenchmarkClassGenerator {
 		benchmark.declaredMethods.filter [
 			static == false && simpleName.startsWith("loop")
 		]
-	}
-
-	def dispatch makeStatic(MutableFieldDeclaration field) {
-		field.static = true
-	}
-
-	def dispatch makeStatic(MutableMethodDeclaration method) {
-		method.static = true
-	}
-
-	def dispatch propertyType(MutableFieldDeclaration field) {
-		field.type
-	}
-
-	def dispatch propertyType(MutableMethodDeclaration method) {
-		method.returnType
 	}
 }

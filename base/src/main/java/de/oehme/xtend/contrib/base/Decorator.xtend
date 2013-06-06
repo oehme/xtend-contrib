@@ -6,7 +6,8 @@ import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.InterfaceDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
-import org.eclipse.xtend.lib.macro.declaration.ParameterDeclaration
+
+import static extension de.oehme.xtend.contrib.base.MacroExtensions.*
 
 /**
  * Creates a decorator for the given interface.
@@ -30,11 +31,9 @@ class DecoratorProcessor extends AbstractClassProcessor {
 		val iface = typeof(CharSequence).findTypeGlobally as InterfaceDeclaration // dummy for testing
 
 		iface.declaredMethods.forEach [ declared |
-			if (!cls.hasMethod(declared)) {
-				cls.addMethod(declared.simpleName) [ delegated |
-					delegated.returnType = declared.returnType
-					declared.parameters.forEach[delegated.addParameter(simpleName, type)]
-					delegated.body = [
+			if (!cls.hasMethod(declared.signature)) {
+				cls.addImplementationFor(declared) [
+					body = [
 						'''
 							«declared.maybeReturn» delegate.«declared.simpleName»(«declared.parameters.join(",")[simpleName]»);
 						''']
@@ -45,38 +44,7 @@ class DecoratorProcessor extends AbstractClassProcessor {
 		cls.addField("delegate") [
 			type = iface.newTypeReference
 		]
-		cls.addConstructor [
-			addParameter("delegate", iface.newTypeReference)
-			body = [
-				'''
-					this.delegate = delegate;
-				''']
-		]
-	}
-
-	def hasMethod(MutableClassDeclaration cls, MethodDeclaration method) {
-		cls.declaredMethods.exists[signatureMatches(method)]
-	}
-
-	def signatureMatches(MethodDeclaration left, MethodDeclaration right) {
-		left.simpleName == right.simpleName && left.parametersMatch(right)
-	}
-
-	def parametersMatch(MethodDeclaration left, MethodDeclaration right) {
-		if (left.parameters.size != right.parameters.size) {
-			false
-		} else {
-			for (i : 0 ..< left.parameters.size) {
-				if (!left.parameters.get(i).matches(right.parameters.get(i))) {
-					return false
-				}
-			}
-			true
-		}
-	}
-
-	def matches(ParameterDeclaration left, ParameterDeclaration right) {
-		left.type == right.type
+		cls.addDataConstructor
 	}
 
 	def maybeReturn(MethodDeclaration declared) {

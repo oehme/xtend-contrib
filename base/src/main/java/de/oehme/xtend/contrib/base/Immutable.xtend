@@ -8,6 +8,8 @@ import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtext.xbase.lib.Procedures
 
+import static extension de.oehme.xtend.contrib.base.MacroExtensions.*
+
 @Active(typeof(ImmutableProcessor))
 annotation Immutable {
 }
@@ -28,10 +30,10 @@ class ImmutableProcessor extends AbstractClassProcessor {
 				returnType = cls.newTypeReference
 				body = [
 					'''
-						return new «cls.simpleName»(«cls.dataFields.join(",")[simpleName]»);
+						return new «cls.simpleName»(«cls.persistentState.join(",")[simpleName]»);
 					''']
 			]
-			cls.dataFields.forEach [ field |
+			cls.persistentState.forEach [ field |
 				addMethod(field.simpleName) [
 					addParameter(field.simpleName, field.type)
 					returnType = cls.builderClass(context).newTypeReference
@@ -67,18 +69,7 @@ class ImmutableProcessor extends AbstractClassProcessor {
 				''']
 		]
 
-		cls.addConstructor [
-			cls.dataFields.forEach [ field |
-				addParameter(field.simpleName, field.type)
-			]
-			body = [
-				'''
-					«FOR p : cls.dataFields»
-						this.«p.simpleName» = «p.simpleName»;
-					«ENDFOR»
-				''']
-		]
-		cls.dataFields.forEach [ field |
+		cls.persistentState.forEach [ field |
 			cls.addMethod("get" + field.simpleName.toFirstUpper) [
 				returnType = field.type
 				body = [
@@ -93,45 +84,15 @@ class ImmutableProcessor extends AbstractClassProcessor {
 			]
 			field.remove
 		]
-		cls.addMethod("equals") [
-			returnType = primitiveBoolean
-			addParameter("o", object)
-			body = [
-				'''
-					if (o instanceof «cls.simpleName») {
-						«cls.simpleName» other = («cls.simpleName») o;
-						return «cls.dataFields.join("\n&& ")['''«objects».equal(«simpleName», other.«simpleName»)''']»;
-					}
-					return false;
-				''']
-		]
-		cls.addMethod("hashCode") [
-			returnType = primitiveInt
-			body = ['''return «objects».hashCode(«cls.dataFields.join(",")[simpleName]»);''']
-		]
-		cls.addMethod("toString") [
-			returnType = string
-			body = [
-				'''
-					return «objects».toStringHelper(«cls.simpleName».class)
-					«FOR a : cls.declaredFields»
-						.add("«a.simpleName»",«a.simpleName»)
-					«ENDFOR»
-					.toString();
-				''']
-		]
-	}
 
-	def dataFields(MutableClassDeclaration cls) {
-		cls.declaredFields.filter[static == false]
+		cls.addDataConstructor
+		cls.addDataEquals(context)
+		cls.addDataHashCode(context)
+		cls.addDataToString(context)
 	}
 
 	def builderClassName(ClassDeclaration cls) {
 		cls.qualifiedName + "Builder"
-	}
-
-	def objects() {
-		"com.google.common.base.Objects"
 	}
 
 	def builderClass(ClassDeclaration cls, extension TransformationContext ctx) {
