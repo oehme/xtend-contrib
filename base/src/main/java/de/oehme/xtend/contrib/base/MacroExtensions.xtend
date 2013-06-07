@@ -2,7 +2,6 @@ package de.oehme.xtend.contrib.base
 
 import com.google.common.collect.ImmutableList
 import java.util.List
-import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.CompilationStrategy
 import org.eclipse.xtend.lib.macro.declaration.FieldDeclaration
@@ -14,9 +13,10 @@ import org.eclipse.xtend.lib.macro.declaration.TypeReference
 import org.eclipse.xtend.lib.macro.declaration.Visibility
 
 /**
- * Extension methods that help you with writing Xtend macros ("Active Annotations").
+ * Extension methods that help you inspect and manipulate
+ * the Java AST during Xtend active annotation processing
  */
-class MacroExtensions {
+class ASTExtensions {
 
 	def static getSignature(MethodDeclaration method) {
 		createSignature(method.simpleName, method.parameters.map[type])
@@ -69,70 +69,6 @@ class MacroExtensions {
 		]
 		wrapper.body = indirection
 		inner
-	}
-
-	/**
-	 * Adds a constructor that takes all non-transient fields of this class.
-	 */
-	def static addDataConstructor(MutableClassDeclaration cls) {
-		cls.addConstructor [
-			val fields = persistentState(cls)
-			fields.forEach [ f |
-				addParameter(f.simpleName, f.type)
-			]
-			body = [
-				'''
-					«FOR f : fields»
-						this.«f.simpleName» = «f.simpleName»;
-					«ENDFOR»
-				''']
-		]
-	}
-
-	/**
-	 * Adds a toString method that prints all persistent fields of this class
-	 */
-	def static addDataToString(MutableClassDeclaration cls, extension TransformationContext context) {
-		cls.addMethod("toString") [
-			returnType = string
-			body = [
-				'''
-					return com.google.common.base.Objects.toStringHelper(«cls.simpleName».class)
-					«FOR a : cls.declaredFields»
-						.add("«a.simpleName»",«a.simpleName»)
-					«ENDFOR»
-					.toString();
-				''']
-		]
-	}
-
-	/**
-	 * Adds an equals method that compares all persistent fields of this class
-	 */
-	def static addDataEquals(MutableClassDeclaration cls, extension TransformationContext ctx) {
-		cls.addMethod("equals") [
-			returnType = primitiveBoolean
-			addParameter("o", object)
-			body = [
-				'''
-					if (o instanceof «cls.simpleName») {
-						«cls.simpleName» other = («cls.simpleName») o;
-						return «cls.persistentState.join("\n&& ")[
-						'''com.google.common.base.Objects.equal(«simpleName», other.«simpleName»)''']»;
-					}
-					return false;
-				''']
-		]
-	}
-
-	/**
-	 * Adds a hashCode method that takes all persistent fields of this class
-	 */
-	def static addDataHashCode(MutableClassDeclaration cls, extension TransformationContext ctx) {
-		cls.addMethod("hashCode") [
-			returnType = primitiveInt
-			body = ['''return com.google.common.base.Objects.hashCode(«cls.persistentState.join(",")[simpleName]»);''']
-		]
 	}
 
 	/**

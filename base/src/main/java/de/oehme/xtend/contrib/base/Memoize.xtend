@@ -10,7 +10,7 @@ import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeReference
 import org.eclipse.xtext.xbase.lib.Exceptions
 
-import static extension de.oehme.xtend.contrib.base.MacroExtensions.*
+import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
 
 /**
  * Memoizes invocations of a method. When the method is called multiple times with the same parameters, a cached result will be returned.

@@ -8,7 +8,7 @@ import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtext.xbase.lib.Procedures
 
-import static extension de.oehme.xtend.contrib.base.MacroExtensions.*
+import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
 
 @Active(typeof(ImmutableProcessor))
 annotation Immutable {
@@ -21,6 +21,7 @@ class ImmutableProcessor extends AbstractClassProcessor {
 	}
 
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
+		val extension transformations = new CommonTransformations(context)
 		if(cls.extendedClass != object) cls.addError("Inheritance does not play well with immutability")
 		cls.final = true
 
@@ -86,9 +87,9 @@ class ImmutableProcessor extends AbstractClassProcessor {
 		]
 
 		cls.addDataConstructor
-		cls.addDataEquals(context)
-		cls.addDataHashCode(context)
-		cls.addDataToString(context)
+		cls.addDataEquals
+		cls.addDataHashCode
+		cls.addDataToString
 	}
 
 	def builderClassName(ClassDeclaration cls) {

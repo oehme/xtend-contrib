@@ -7,7 +7,7 @@ import org.eclipse.xtend.lib.macro.declaration.InterfaceDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 
-import static extension de.oehme.xtend.contrib.base.MacroExtensions.*
+import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
 
 /**
  * Creates a decorator for the given interface.
@@ -20,10 +20,11 @@ annotation Decorator {
 	Class<?> value;
 }
 
-//TODO handle generics
+//TODO how will we handle generics?
 class DecoratorProcessor extends AbstractClassProcessor {
 
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
+		val extension transformations = new CommonTransformations(context)
 
 		//fails due to https://bugs.eclipse.org/bugs/show_bug.cgi?id=409600
 		//val forwarding = findTypeGlobally(typeof(Decorator))

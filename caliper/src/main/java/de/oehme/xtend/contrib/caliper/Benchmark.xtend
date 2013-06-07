@@ -8,7 +8,7 @@ import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.Visibility
 import org.eclipse.xtend.lib.macro.AbstractClassProcessor
-import static extension de.oehme.xtend.contrib.base.MacroExtensions.*
+import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
 
 /**
  * <p>
