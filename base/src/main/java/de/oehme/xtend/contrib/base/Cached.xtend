@@ -13,7 +13,7 @@ import org.eclipse.xtext.xbase.lib.Exceptions
 import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
 
 /**
- * Memoizes invocations of a method. When the method is called multiple times with the same parameters, a cached result will be returned.
+ * Caches invocations of a method. When the method is called multiple times with the same parameters, a cached result will be returned.
  * Useful for expensive calculations or recursive algorithms.
  * <br>
  * The method must guarantee the following conditions:
@@ -24,7 +24,7 @@ import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
  * </ul>
  */
 @Active(typeof(MemoizeProcessor))
-annotation Memoize {
+annotation Cached {
 }
 
 class MemoizeProcessor implements TransformationParticipant<MutableMethodDeclaration> {

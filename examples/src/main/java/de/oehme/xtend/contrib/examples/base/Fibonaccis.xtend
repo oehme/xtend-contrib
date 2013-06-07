@@ -1,6 +1,6 @@
 package de.oehme.xtend.contrib.examples.base
 
-import de.oehme.xtend.contrib.base.Memoize
+import de.oehme.xtend.contrib.base.Cached
 import java.math.BigInteger
 
 class Fibonaccis {
@@ -12,7 +12,7 @@ class Fibonaccis {
 		}
 	}
 
-	@Memoize
+	@Cached
 	def BigInteger memoizedFibonacci(int n) {
 		switch n {
 			case 0: 0bi
@@ -32,7 +32,7 @@ class Fibonaccis {
 		x
 	}
 
-	@Memoize
+	@Cached
 	def foo(String a, Integer b) {
 		a + b
 	}

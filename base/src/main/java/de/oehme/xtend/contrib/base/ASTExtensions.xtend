@@ -1,9 +1,9 @@
 package de.oehme.xtend.contrib.base
 
 import com.google.common.collect.ImmutableList
-import java.util.List
 import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.CompilationStrategy
+import org.eclipse.xtend.lib.macro.declaration.ExecutableDeclaration
 import org.eclipse.xtend.lib.macro.declaration.FieldDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
@@ -18,16 +18,42 @@ import org.eclipse.xtend.lib.macro.declaration.Visibility
  */
 class ASTExtensions {
 
-	def static getSignature(MethodDeclaration method) {
-		createSignature(method.simpleName, method.parameters.map[type])
+	def static signature(ExecutableDeclaration it) {
+		signature(simpleName, parameters.map[p|p.type])
 	}
 
-	def static createSignature(String name, List<? extends TypeReference> params) {
+	def static constructorSignature(ClassDeclaration cls, TypeReference... params) {
+		signature(cls.simpleName, params)
+	}
+
+	def static signature(String name, TypeReference... params) {
 		new Signature(name, ImmutableList::copyOf(params))
 	}
 
-	def static hasMethod(ClassDeclaration cls, Signature sig) {
-		cls.declaredMethods.exists[signature == sig]
+	def static hasExecutable(ClassDeclaration cls, Signature sig) {
+		cls.declaredMembers.filter(typeof(ExecutableDeclaration)).exists[signature == sig]
+	}
+
+	def static hasDataConstructor(ClassDeclaration cls) {
+		cls.hasExecutable(constructorSignature(cls, cls.persistentState.map[type]))
+	}
+
+	/**
+	 * Adds a constructor that takes all non-transient fields of this class.
+	 */
+	def static addDataConstructor(MutableClassDeclaration cls) {
+		cls.addConstructor [
+			val fields = persistentState(cls)
+			fields.forEach [ f |
+				addParameter(f.simpleName, f.type)
+			]
+			body = [
+				'''
+					«FOR f : fields»
+						this.«f.simpleName» = «f.simpleName»;
+					«ENDFOR»
+				''']
+		]
 	}
 
 	/**
@@ -69,6 +95,13 @@ class ASTExtensions {
 		]
 		wrapper.body = indirection
 		inner
+	}
+
+	/**
+	 * All non-static, non-transient fields of this class
+	 */
+	def static persistentState(ClassDeclaration cls) {
+		cls.declaredFields.filter[!transient && !static]
 	}
 
 	/**

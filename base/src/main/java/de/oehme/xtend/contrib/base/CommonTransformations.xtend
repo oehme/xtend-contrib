@@ -15,22 +15,8 @@ class CommonTransformations {
 		this.delegate = delegate
 	}
 
-	/**
-	 * Adds a constructor that takes all non-transient fields of this class.
-	 */
-	def addDataConstructor(MutableClassDeclaration cls) {
-		cls.addConstructor [
-			val fields = persistentState(cls)
-			fields.forEach [ f |
-				addParameter(f.simpleName, f.type)
-			]
-			body = [
-				'''
-					«FOR f : fields»
-						this.«f.simpleName» = «f.simpleName»;
-					«ENDFOR»
-				''']
-		]
+	def hasToString(MutableClassDeclaration cls) {
+		cls.hasExecutable("toString".signature)
 	}
 
 	/**
@@ -50,6 +36,10 @@ class CommonTransformations {
 		]
 	}
 
+	def hasEquals(MutableClassDeclaration cls) {
+		cls.hasExecutable("equals".signature(object))
+	}
+
 	/**
 	 * Adds an equals method that compares all persistent fields of this class
 	 */
@@ -67,6 +57,10 @@ class CommonTransformations {
 					return false;
 				''']
 		]
+	}
+
+	def hasHashCode(MutableClassDeclaration cls) {
+		cls.hasExecutable("hashCode".signature)
 	}
 
 	/**

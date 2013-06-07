@@ -86,10 +86,10 @@ class ImmutableProcessor extends AbstractClassProcessor {
 			field.remove
 		]
 
-		cls.addDataConstructor
-		cls.addDataEquals
-		cls.addDataHashCode
-		cls.addDataToString
+		if(!cls.hasDataConstructor) cls.addDataConstructor
+		if(!cls.hasEquals) cls.addDataEquals
+		if(!cls.hasHashCode) cls.addDataHashCode
+		if(!cls.hasToString) cls.addDataToString
 	}
 
 	def builderClassName(ClassDeclaration cls) {

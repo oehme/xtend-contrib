@@ -24,7 +24,6 @@ annotation Decorator {
 class DecoratorProcessor extends AbstractClassProcessor {
 
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
-		val extension transformations = new CommonTransformations(context)
 
 		//fails due to https://bugs.eclipse.org/bugs/show_bug.cgi?id=409600
 		//val forwarding = findTypeGlobally(typeof(Decorator))
@@ -32,7 +31,7 @@ class DecoratorProcessor extends AbstractClassProcessor {
 		val iface = typeof(CharSequence).findTypeGlobally as InterfaceDeclaration // dummy for testing
 
 		iface.declaredMethods.forEach [ declared |
-			if (!cls.hasMethod(declared.signature)) {
+			if (!cls.hasExecutable(declared.signature)) {
 				cls.addImplementationFor(declared) [
 					body = [
 						'''
@@ -45,7 +44,7 @@ class DecoratorProcessor extends AbstractClassProcessor {
 		cls.addField("delegate") [
 			type = iface.newTypeReference
 		]
-		cls.addDataConstructor
+		if(!cls.hasDataConstructor) cls.addDataConstructor
 	}
 
 	def maybeReturn(MethodDeclaration declared) {
