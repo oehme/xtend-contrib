@@ -7,7 +7,7 @@ import java.util.List
 @Benchmark
 class FibonacciBenchmarkXtend24 {
 
-	List<Integer> nValues = #[5, 10, 20]
+	val List<Integer> nValues = #[5, 10, 20]
 
 	def timeDumbFibonacci() {
 		for (i : 1 .. iterations) {

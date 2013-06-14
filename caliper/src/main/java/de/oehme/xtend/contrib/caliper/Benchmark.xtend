@@ -65,31 +65,16 @@ annotation Benchmark {
 }
 
 class BenchmarkProcessor extends AbstractClassProcessor {
-	override doTransform(MutableClassDeclaration cls, TransformationContext context) {
-		new BenchmarkClassGenerator(context, cls).generate
-	}
-}
 
-@Data
-class BenchmarkClassGenerator {
-	val extension TransformationContext context
-	val MutableClassDeclaration benchmark
-
-	def generate() {
+	override doTransform(MutableClassDeclaration benchmark, extension TransformationContext context) {
 		benchmark.final = true
 		benchmark.extendedClass = typeof(SimpleBenchmark).newTypeReference
-		benchmark.addMethod("main") [
-			static = true
-			addParameter("args", newArrayTypeReference(string))
-			body = [extension it|
-				'''
-					«typeof(Runner).newTypeReference.toJavaCode».main(«benchmark.simpleName».class, args);
-				''']
-		]
-		timedMethods.forEach [
+
+		benchmark.timedMethods.forEach [
 			addParameter("iterations", primitiveInt)
 		]
-		loopMethods.forEach [ method |
+
+		benchmark.loopMethods.forEach [ method |
 			benchmark.addMethod(method.simpleName.replaceFirst("loop", "time")) [
 				addParameter("iterations", primitiveInt)
 				body = [
@@ -100,7 +85,8 @@ class BenchmarkClassGenerator {
 					''']
 			]
 		]
-		benchmarkParameters.forEach [ param |
+
+		benchmark.benchmarkParameters.forEach [ param |
 			benchmark.addField(param.simpleName.replace("Values", "")) [
 				addAnnotation(typeof(Param).findTypeGlobally)
 				type = param.propertyType.actualTypeArguments.get(0)
@@ -108,21 +94,30 @@ class BenchmarkClassGenerator {
 			param.visibility = Visibility::DEFAULT
 			param.static = true
 		]
+
+		benchmark.addMethod("main") [
+			static = true
+			addParameter("args", newArrayTypeReference(string))
+			body = [extension it|
+				'''
+					«typeof(Runner).newTypeReference.toJavaCode».main(«benchmark.simpleName».class, args);
+				''']
+		]
 	}
 
-	def benchmarkParameters() {
+	def benchmarkParameters(MutableClassDeclaration benchmark) {
 		(benchmark.declaredFields + benchmark.declaredMethods).filter [
 			simpleName.endsWith("Values")
 		]
 	}
 
-	def timedMethods() {
+	def timedMethods(MutableClassDeclaration benchmark) {
 		benchmark.declaredMethods.filter [
 			static == false && simpleName.startsWith("time")
 		]
 	}
 
-	def loopMethods() {
+	def loopMethods(MutableClassDeclaration benchmark) {
 		benchmark.declaredMethods.filter [
 			static == false && simpleName.startsWith("loop")
 		]

@@ -8,6 +8,8 @@ import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.Visibility
 
+import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
+
 @Active(typeof(ExtractInterfaceProcessor))
 annotation ExtractInterface {
 }
@@ -20,10 +22,8 @@ class ExtractInterfaceProcessor extends AbstractClassProcessor {
 
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
 		findInterface(cls.qualifiedInterfaceName) => [ iface |
-			cls.declaredMethods.filter [
-				visibility == Visibility::PUBLIC
-				static == false
-			].forEach [ method |
+			cls.declaredMethods.filter [visibility == Visibility::PUBLIC static == false]
+			.forEach [ method |
 				iface.addMethod(method.simpleName) [ extracted |
 					extracted.visibility = method.visibility
 					extracted.returnType = method.returnType
@@ -32,7 +32,6 @@ class ExtractInterfaceProcessor extends AbstractClassProcessor {
 					extracted.exceptions = method.exceptions
 				]
 			]
-		//todo add implementedBy annotation
 		]
 	}
 
@@ -47,10 +46,5 @@ class ExtractInterfaceProcessor extends AbstractClassProcessor {
 		} else {
 			throw new IllegalArgumentException("Class name must start with 'Default' or end with 'Impl'")
 		}
-	}
-
-	def packageName(ClassDeclaration cls) {
-		val parts = cls.qualifiedName.split("\\.")
-		parts.take(parts.size - 1).join(".")
 	}
 }

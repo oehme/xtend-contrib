@@ -33,10 +33,9 @@ class DecoratorProcessor extends AbstractClassProcessor {
 		iface.declaredMethods.forEach [ declared |
 			if (!cls.hasExecutable(declared.signature)) {
 				cls.addImplementationFor(declared) [
-					body = [
-						'''
-							«declared.maybeReturn» delegate.«declared.simpleName»(«declared.parameters.join(",")[simpleName]»);
-						''']
+					'''
+						«declared.maybeReturn» delegate.«declared.simpleName»(«declared.parameters.join(",")[simpleName]»);
+					'''
 				]
 			}
 		]

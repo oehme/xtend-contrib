@@ -61,9 +61,8 @@ class ASTExtensions {
 	 * You are free to modify the default settings, of course, e.g. widening the visibility of the
 	 * implementing method.
 	 */
-	//TODO maybe just take the body instead of an initializer, because other modifications will be rare
 	def static addImplementationFor(MutableClassDeclaration cls, MethodDeclaration baseMethod,
-		(MutableMethodDeclaration)=>void init) {
+		CompilationStrategy implementation) {
 		val method = cls.addMethod(baseMethod.simpleName) [
 			visibility = baseMethod.visibility
 			returnType = baseMethod.returnType
@@ -72,8 +71,8 @@ class ASTExtensions {
 			baseMethod.parameters.forEach[p|addParameter(p.simpleName, p.type)]
 			varArgs = baseMethod.varArgs
 			docComment = baseMethod.docComment
+			body = implementation
 		]
-		init.apply(method)
 		method
 	}
 
@@ -95,6 +94,25 @@ class ASTExtensions {
 		]
 		wrapper.body = indirection
 		inner
+	}
+
+	def static addGetter(MutableFieldDeclaration field) {
+		field.declaringType.addMethod("get" + field.simpleName.toFirstUpper) [
+			returnType = field.type
+			body = [
+				'''
+					return «field.simpleName»;
+				''']
+		]
+	}
+
+	def static addSetter(MutableFieldDeclaration field) {
+		field.declaringType.addMethod("set" + field.simpleName.toFirstUpper) [
+			addParameter(field.simpleName, field.type)
+			body = [
+				'''this.«field.simpleName» = «field.simpleName»;'''
+			]
+		]
 	}
 
 	/**
@@ -133,6 +151,11 @@ class ASTExtensions {
 
 	def static dispatch propertyType(MethodDeclaration method) {
 		method.returnType
+	}
+
+	def static packageName(ClassDeclaration cls) {
+		val parts = cls.qualifiedName.split("\\.")
+		parts.take(parts.size - 1).join(".")
 	}
 }
 

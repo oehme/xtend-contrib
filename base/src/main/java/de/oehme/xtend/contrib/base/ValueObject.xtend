@@ -10,11 +10,15 @@ import org.eclipse.xtext.xbase.lib.Procedures
 
 import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
 
-@Active(typeof(ImmutableProcessor))
-annotation Immutable {
+/**
+ * Turns your class into an immutable value object with a builder, getters for all fields
+ * and default equals, hashcode and toString methods.
+ */
+@Active(typeof(ValueObjectProcessor))
+annotation ValueObject {
 }
 
-class ImmutableProcessor extends AbstractClassProcessor {
+class ValueObjectProcessor extends AbstractClassProcessor {
 
 	override doRegisterGlobals(ClassDeclaration cls, RegisterGlobalsContext context) {
 		context.registerClass(cls.builderClassName)
@@ -23,8 +27,8 @@ class ImmutableProcessor extends AbstractClassProcessor {
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
 		val extension transformations = new CommonTransformations(context)
 		if(cls.extendedClass != object) cls.addError("Inheritance does not play well with immutability")
-		cls.final = true
 
+		cls.final = true
 		val builder = cls.builderClass(context) => [
 			final = true
 			addMethod("build") [
@@ -71,13 +75,7 @@ class ImmutableProcessor extends AbstractClassProcessor {
 		]
 
 		cls.persistentState.forEach [ field |
-			cls.addMethod("get" + field.simpleName.toFirstUpper) [
-				returnType = field.type
-				body = [
-					'''
-						return «field.simpleName»;
-					''']
-			]
+			field.addGetter
 			//TODO https://bugs.eclipse.org/bugs/show_bug.cgi?id=404167
 			cls.addField(field.simpleName) [
 				type = field.type

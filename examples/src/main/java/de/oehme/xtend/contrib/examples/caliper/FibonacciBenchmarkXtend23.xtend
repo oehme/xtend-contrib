@@ -8,8 +8,6 @@ import de.oehme.xtend.contrib.examples.base.Fibonaccis
 
 class FibonacciBenchmarkXtend23 extends SimpleBenchmark {
 
-	val extension Fibonaccis fib = new Fibonaccis
-
 	@Param
 	int n
 
@@ -17,19 +15,19 @@ class FibonacciBenchmarkXtend23 extends SimpleBenchmark {
 
 	def timeMemoizedFibonacci(int iterations) {
 		(1 .. iterations).forEach [
-			n.memoizedFibonacci
+			new Fibonaccis().memoizedFibonacci(n)
 		]
 	}
 
 	def timeDumbFibonacci(int iterations) {
 		(1 .. iterations).forEach [
-			n.dumbFibonacci
+			new Fibonaccis().dumbFibonacci(n)
 		]
 	}
 
 	def timeiterativeFibonacci(int iterations) {
 		(1 .. iterations).forEach [
-			n.iterativeFibonacci
+			new Fibonaccis().iterativeFibonacci(n)
 		]
 	}
 

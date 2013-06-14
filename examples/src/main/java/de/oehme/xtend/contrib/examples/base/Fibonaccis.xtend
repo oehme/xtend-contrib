@@ -24,16 +24,11 @@ class Fibonaccis {
 	def BigInteger iterativeFibonacci(int n) {
 		var x = 0bi
 		var y = 1bi
-		for (i : 1 .. n) {
+		for (i : 0 ..< n) {
 			val z = x
 			x = y
 			y = y + z
 		}
 		x
-	}
-
-	@Cached
-	def foo(String a, Integer b) {
-		a + b
 	}
 }
