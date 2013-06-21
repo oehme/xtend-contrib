@@ -214,7 +214,7 @@ class CacheKey {
 
 	override equals(Object obj) {
 		if (obj instanceof CacheKey) {
-			Arrays::equals(parameters, (obj as CacheKey).parameters)
+			return Arrays::equals(parameters, (obj as CacheKey).parameters)
 		}
 		false
 	}
