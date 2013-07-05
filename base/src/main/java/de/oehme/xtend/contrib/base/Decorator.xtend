@@ -14,6 +14,8 @@ import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
  * It will contain a {@code delegate} field, a constructor that takes the delegate as a parameter
  * and default implementations for all methods.
  * You only need to customize the methods you are really interested in.
+ *
+ * WARNING: This does not work yet due to an Xtend bug
  */
 @Active(typeof(DecoratorProcessor))
 annotation Decorator {

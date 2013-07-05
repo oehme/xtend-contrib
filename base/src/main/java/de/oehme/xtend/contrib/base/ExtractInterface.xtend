@@ -22,12 +22,16 @@ class ExtractInterfaceProcessor extends AbstractClassProcessor {
 
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
 		findInterface(cls.qualifiedInterfaceName) => [ iface |
+			cls.implementedInterfaces = cls.implementedInterfaces + #[iface.newTypeReference]
 			cls.declaredMethods.filter [visibility == Visibility::PUBLIC static == false]
 			.forEach [ method |
 				iface.addMethod(method.simpleName) [ extracted |
-					extracted.visibility = method.visibility
+					extracted.visibility = Visibility::PUBLIC
+					//blocked on https://bugs.eclipse.org/bugs/show_bug.cgi?id=412361
+					//method.typeParameters.forEach[extracted.addTypeParameter(simpleName, upperBounds)]
 					extracted.returnType = method.returnType
 					method.parameters.forEach[extracted.addParameter(simpleName, type)]
+					extracted.varArgs = method.varArgs
 					extracted.docComment = method.docComment
 					extracted.exceptions = method.exceptions
 				]
@@ -42,7 +46,7 @@ class ExtractInterfaceProcessor extends AbstractClassProcessor {
 		if (simpleName.startsWith("Default")) {
 			simpleName.substring(7)
 		} else if (simpleName.endsWith("Impl")) {
-			simpleName.substring(0, simpleName.length - 5)
+			simpleName.substring(0, simpleName.length - 4)
 		} else {
 			throw new IllegalArgumentException("Class name must start with 'Default' or end with 'Impl'")
 		}
