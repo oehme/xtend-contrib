@@ -4,11 +4,11 @@ import de.oehme.xtend.contrib.base.ExtractInterface
 
 @ExtractInterface
 class DefaultThing {
-	def foo() {
+	override foo() {
 
 	}
 
-	def bar(String baz) {
+	override bar(String baz) {
 		"foobar"
 	}
 }
