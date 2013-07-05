@@ -9,17 +9,17 @@ describe ExtractInterface {
 	)
 
 	val example = '''
-			package foo
+		package foo
 
-			import de.oehme.xtend.contrib.base.ExtractInterface
+		import de.oehme.xtend.contrib.base.ExtractInterface
 
-			@ExtractInterface
-			class DefaultFoo {
-				override int bar(String bar, int... baz) throws Exception{
-					new Integer(1)
-				}
+		@ExtractInterface
+		class DefaultFoo {
+			override int bar(String bar, int... baz) throws Exception{
+				new Integer(1)
 			}
-		'''
+		}
+	'''
 
 		fact "an interface is generated" {
 			example.compile[
@@ -43,7 +43,7 @@ describe ExtractInterface {
 		fact "declared exceptions are copied" {
 			example.compile[
 				val iface = getCompiledClass("foo.Foo")
-				iface.bar.exceptionTypes should contain Exception
+				iface.bar.exceptionTypes should contain typeof(Exception)
 			]
 		}
 
@@ -51,7 +51,7 @@ describe ExtractInterface {
 		fact "the return type is copied" {
 			example.compile[
 				val iface = getCompiledClass("foo.Foo")
-				iface.bar.returnType should be int
+				iface.bar.returnType should be typeof(int)
 			]
 		}
 		
@@ -63,6 +63,6 @@ describe ExtractInterface {
 		}
 		
 		def bar(Class<?> iface) {
-			iface.getMethod("bar", String, typeof(int[]))
+			iface.getMethod("bar", typeof(String), typeof(int[]))
 		}
 }
