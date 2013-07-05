@@ -2,7 +2,7 @@ package de.oehme.xtend.contrib.base
 
 import org.eclipse.xtend.core.compiler.batch.XtendCompilerTester
 import com.google.common.base.Objects
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
+import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
 
 describe ValueObject {
 	extension XtendCompilerTester compilerTester = XtendCompilerTester::newXtendCompilerTester(typeof(ValueObject), typeof(Objects), typeof(Procedure1))
