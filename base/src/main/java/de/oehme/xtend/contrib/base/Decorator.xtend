@@ -31,7 +31,7 @@ class DecoratorProcessor extends AbstractClassProcessor {
 		//val forwarding = findTypeGlobally(typeof(Decorator))
 		//val iface = cls.findAnnotation(forwarding).getValue('value') as InterfaceDeclaration
 		val iface = typeof(CharSequence).findTypeGlobally as InterfaceDeclaration // dummy for testing
-
+		cls.implementedInterfaces = cls.implementedInterfaces + #[iface.newTypeReference]
 		iface.declaredMethods.forEach [ declared |
 			if (!cls.hasExecutable(declared.signature)) {
 				cls.addImplementationFor(declared) [
