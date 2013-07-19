@@ -3,7 +3,7 @@
   <parent>
     <groupId>de.oehme.xtend.contrib</groupId>
     <artifactId>xtend-contrib-parent</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1-SNAPSHOT</version>
   </parent>
   <artifactId>xtend-contrib-querydsl</artifactId>
 
