@@ -23,7 +23,7 @@ import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
  * 	<li>The method is referentially transparent (has no externally visible side effects)</li>
  * </ul>
  */
-@Active(typeof(MemoizeProcessor))
+@Active(MemoizeProcessor)
 annotation Cached {
 }
 
@@ -142,9 +142,9 @@ abstract class ParametrizedMethodMemoizer extends MethodMemoizer {
 				|| e instanceof com.google.common.util.concurrent.UncheckedExecutionException
 				|| e instanceof com.google.common.util.concurrent.ExecutionError) {
 				Throwable cause = e.getCause();
-				throw «typeof(Exceptions).newTypeReference.toJavaCode».sneakyThrow(cause);
+				throw «Exceptions.newTypeReference.toJavaCode».sneakyThrow(cause);
 			} else {
-				throw «typeof(Exceptions).newTypeReference.toJavaCode».sneakyThrow(e);
+				throw «Exceptions.newTypeReference.toJavaCode».sneakyThrow(e);
 			}
 		}
 	'''
@@ -193,7 +193,7 @@ class MultipleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
 	'''
 
 	override protected cacheKeyType() {
-		typeof(CacheKey).newTypeReference
+		CacheKey.newTypeReference
 	}
 }
 
@@ -214,12 +214,12 @@ class CacheKey {
 
 	override equals(Object obj) {
 		if (obj instanceof CacheKey) {
-			return Arrays::equals(parameters, (obj as CacheKey).parameters)
+			return Arrays.equals(parameters, (obj as CacheKey).parameters)
 		}
 		false
 	}
 
 	override hashCode() {
-		Arrays::hashCode(parameters)
+		Arrays.hashCode(parameters)
 	}
 }

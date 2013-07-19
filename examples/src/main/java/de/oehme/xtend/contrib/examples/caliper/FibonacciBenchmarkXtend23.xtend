@@ -11,7 +11,7 @@ class FibonacciBenchmarkXtend23 extends SimpleBenchmark {
 	@Param
 	int n
 
-	public val nValues = ImmutableList::of(5, 10, 20)
+	public val nValues = ImmutableList.of(5, 10, 20)
 
 	def timeMemoizedFibonacci(int iterations) {
 		(1 .. iterations).forEach [
@@ -32,6 +32,6 @@ class FibonacciBenchmarkXtend23 extends SimpleBenchmark {
 	}
 
 	def static void main(String[] args) {
-		Runner::main(typeof(FibonacciBenchmarkXtend23), newArrayList)
+		Runner.main(FibonacciBenchmarkXtend23, newArrayList)
 	}
 }

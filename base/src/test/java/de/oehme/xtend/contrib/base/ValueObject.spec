@@ -6,7 +6,7 @@ import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
 import com.google.common.base.CharMatcher
 
 describe ValueObject {
-	extension XtendCompilerTester compilerTester = XtendCompilerTester::newXtendCompilerTester(typeof(ValueObject), typeof(Objects), typeof(Procedure1))
+	extension XtendCompilerTester compilerTester = XtendCompilerTester::newXtendCompilerTester(ValueObject, Objects, Procedure1)
 
 	context "without customization" {
 		val example = '''
@@ -30,8 +30,8 @@ describe ValueObject {
 		fact "the builder has a setter for each property" {
 			example.compile[
 				val builder = getCompiledClass("foo.ThingBuilder")
-				builder.getDeclaredMethod("a", typeof(String))
-				builder.getDeclaredMethod("b", typeof(Integer))
+				builder.getDeclaredMethod("a", String)
+				builder.getDeclaredMethod("b", Integer)
 			]
 		}
 
@@ -39,15 +39,15 @@ describe ValueObject {
 			example.compile[
 				val cls = getCompiledClass
 				val getA = cls.getDeclaredMethod("getA")
-				getA.returnType should be typeof(String)
+				getA.returnType should be String
 				val getB = cls.getDeclaredMethod("getB")
-				getB.returnType should be typeof(Integer)
+				getB.returnType should be Integer
 			]
 		}
 
 		fact "the class has a data-constructor" {
 			example.compile[
-				getCompiledClass.getConstructor(typeof(String), typeof(Integer))
+				getCompiledClass.getConstructor(String, Integer)
 			]
 		}
 
@@ -60,7 +60,7 @@ describe ValueObject {
 
 		fact "the class has a build method" {
 			example.compile[
-				val buildMethod = getCompiledClass.getDeclaredMethod("build", typeof(Procedure1))
+				val buildMethod = getCompiledClass.getDeclaredMethod("build", Procedure1)
 				buildMethod.returnType should be getCompiledClass
 			]
 		}
@@ -68,21 +68,21 @@ describe ValueObject {
 		fact "the class has a custom hashCode method" {
 			example.compile[
 				val hashCode = getCompiledClass.getDeclaredMethod("hashCode")
-				hashCode.returnType should be typeof(int)
+				hashCode.returnType should be int
 			]
 		}
 
 		fact "the class has a custom toString method" {
 			example.compile[
 				val toString = getCompiledClass.getDeclaredMethod("toString")
-				toString.returnType should be typeof(String)
+				toString.returnType should be String
 			]
 		}
 
 		fact "the class has a custom equals method" {
 			example.compile[
-				val equals = getCompiledClass.getDeclaredMethod("equals", typeof(Object))
-				equals.returnType should be typeof(boolean)
+				val equals = getCompiledClass.getDeclaredMethod("equals", Object)
+				equals.returnType should be boolean
 			]
 		}
 	}

@@ -60,6 +60,7 @@
 
 	<properties>
 		<xtend.version>2.4.2</xtend.version>
+		<jnario.version>0.5.0</jnario.version>
 	</properties>
 
 	<dependencies>
@@ -106,5 +107,6 @@
 		<module>beanio</module>
 		<module>swing</module>
 		<module>examples</module>
+		<module>querydsl</module>
 	</modules>
 </project>

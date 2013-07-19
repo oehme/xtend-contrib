@@ -14,7 +14,7 @@ import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
  * Turns your class into an immutable value object with a builder, getters for all fields
  * and default equals, hashcode and toString methods.
  */
-@Active(typeof(ValueObjectProcessor))
+@Active(ValueObjectProcessor)
 annotation ValueObject {
 }
 
@@ -57,7 +57,7 @@ class ValueObjectProcessor extends AbstractClassProcessor {
 		cls.addMethod("build") [
 			static = true
 			returnType = cls.newTypeReference
-			addParameter("init", typeof(Procedures$Procedure1).newTypeReference(builder.newTypeReference))
+			addParameter("init", Procedures$Procedure1.newTypeReference(builder.newTypeReference))
 			body = [
 				'''
 					«cls.builderClassName» builder = builder();

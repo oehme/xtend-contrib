@@ -11,7 +11,7 @@ import static extension java.lang.reflect.Modifier.*
 describe Cached {
 
 	extension XtendCompilerTester compilerTester = XtendCompilerTester::newXtendCompilerTester(
-		typeof(Cached), typeof(LoadingCache), typeof(Exceptions)
+		Cached, LoadingCache, Exceptions
 	)
 
 	context "with no parameters"{
@@ -29,14 +29,14 @@ describe Cached {
 		facts "about the outer method" {
 			example.compile[
 				val outerMethod = compiledClass.getDeclaredMethod("bar")
-				outerMethod.returnType should be typeof(Integer)
+				outerMethod.returnType should be Integer
 			]
 		}
 
 		facts "about the init method" {
 			example.compile[
 				val initMethod = compiledClass.getDeclaredMethod("bar_init")
-				initMethod.returnType should be typeof(Integer)
+				initMethod.returnType should be Integer
 				assert initMethod.modifiers.private
 			]
 		}
@@ -44,7 +44,7 @@ describe Cached {
 		facts "about the cache field" {
 			example.compile[
 				val cacheField = compiledClass.getDeclaredField("cache0_bar")
-				cacheField.type should be typeof(Integer)
+				cacheField.type should be Integer
 				assert cacheField.modifiers.private
 			]
 		}
@@ -74,15 +74,15 @@ describe Cached {
 
 		facts "about the outer method" {
 			example.compile[
-				val outerMethod = compiledClass.getDeclaredMethod("bar", typeof(String))
-				outerMethod.returnType should be typeof(Integer)
+				val outerMethod = compiledClass.getDeclaredMethod("bar", String)
+				outerMethod.returnType should be Integer
 			]
 		}
 
 		facts "about the init method" {
 			example.compile[
-				val initMethod = compiledClass.getDeclaredMethod("bar_init", typeof(String))
-				initMethod.returnType should be typeof(Integer)
+				val initMethod = compiledClass.getDeclaredMethod("bar_init", String)
+				initMethod.returnType should be Integer
 				assert initMethod.modifiers.private
 			]
 		}
@@ -90,7 +90,7 @@ describe Cached {
 		facts "about the cache field" {
 			example.compile[
 				val cacheField = compiledClass.getDeclaredField("cache0_bar")
-				cacheField.type should be typeof(LoadingCache)
+				cacheField.type should be LoadingCache
 				assert cacheField.modifiers.private
 			]
 		}
@@ -99,7 +99,7 @@ describe Cached {
 			example.compile[
 				val cls = compiledClass
 				val foo = cls.newInstance
-				val bar = cls.getMethod("bar", typeof(String))
+				val bar = cls.getMethod("bar", String)
 
 				val first = bar.invoke(foo, "a")
 				val second = bar.invoke(foo, "a")
@@ -126,15 +126,15 @@ describe Cached {
 
 		facts "about the outer method" {
 			example.compile[
-				val outerMethod = compiledClass.getDeclaredMethod("bar", typeof(String), typeof(Integer))
-				outerMethod.returnType should be typeof(Integer)
+				val outerMethod = compiledClass.getDeclaredMethod("bar", String, Integer)
+				outerMethod.returnType should be Integer
 			]
 		}
 
 		facts "about the init method" {
 			example.compile[
-				val initMethod = compiledClass.getDeclaredMethod("bar_init", typeof(String), typeof(Integer))
-				initMethod.returnType should be typeof(Integer)
+				val initMethod = compiledClass.getDeclaredMethod("bar_init", String, Integer)
+				initMethod.returnType should be Integer
 				assert initMethod.modifiers.private
 			]
 		}
@@ -142,7 +142,7 @@ describe Cached {
 		facts "about the cache field" {
 			example.compile[
 				val cacheField = compiledClass.getDeclaredField("cache0_bar")
-				cacheField.type should be typeof(LoadingCache)
+				cacheField.type should be LoadingCache
 				assert cacheField.modifiers.private
 			]
 		}
@@ -151,7 +151,7 @@ describe Cached {
 			example.compile[
 				val cls = compiledClass
 				val foo = cls.newInstance
-				val bar = cls.getMethod("bar", typeof(String), typeof(Integer))
+				val bar = cls.getMethod("bar", String, Integer)
 
 				val first = bar.invoke(foo, "a", 0)
 				val second = bar.invoke(foo, "a", 0)

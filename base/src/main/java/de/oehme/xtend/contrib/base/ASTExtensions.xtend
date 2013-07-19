@@ -27,11 +27,11 @@ class ASTExtensions {
 	}
 
 	def static signature(String name, TypeReference... params) {
-		new Signature(name, ImmutableList::copyOf(params))
+		new Signature(name, ImmutableList.copyOf(params))
 	}
 
 	def static hasExecutable(ClassDeclaration cls, Signature sig) {
-		cls.declaredMembers.filter(typeof(ExecutableDeclaration)).exists[signature == sig]
+		cls.declaredMembers.filter(ExecutableDeclaration).exists[signature == sig]
 	}
 
 	def static hasDataConstructor(ClassDeclaration cls) {
@@ -89,7 +89,7 @@ class ASTExtensions {
 			wrapper.typeParameters.forEach[p|addTypeParameter(p.simpleName, p.upperBounds)]
 			wrapper.parameters.forEach[p|addParameter(p.simpleName, p.type)]
 			varArgs = wrapper.varArgs
-			visibility = Visibility::PRIVATE
+			visibility = Visibility.PRIVATE
 			body = wrapper.body
 		]
 		wrapper.body = indirection

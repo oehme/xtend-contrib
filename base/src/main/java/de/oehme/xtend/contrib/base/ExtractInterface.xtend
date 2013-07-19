@@ -10,7 +10,7 @@ import org.eclipse.xtend.lib.macro.declaration.Visibility
 
 import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
 
-@Active(typeof(ExtractInterfaceProcessor))
+@Active(ExtractInterfaceProcessor)
 annotation ExtractInterface {
 }
 
@@ -23,10 +23,10 @@ class ExtractInterfaceProcessor extends AbstractClassProcessor {
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
 		findInterface(cls.qualifiedInterfaceName) => [ iface |
 			cls.implementedInterfaces = cls.implementedInterfaces + #[iface.newTypeReference]
-			cls.declaredMethods.filter [visibility == Visibility::PUBLIC static == false]
+			cls.declaredMethods.filter [visibility == Visibility.PUBLIC static == false]
 			.forEach [ method |
 				iface.addMethod(method.simpleName) [ extracted |
-					extracted.visibility = Visibility::PUBLIC
+					extracted.visibility = Visibility.PUBLIC
 					//blocked on https://bugs.eclipse.org/bugs/show_bug.cgi?id=412361
 					//method.typeParameters.forEach[extracted.addTypeParameter(simpleName, upperBounds)]
 					extracted.returnType = method.returnType

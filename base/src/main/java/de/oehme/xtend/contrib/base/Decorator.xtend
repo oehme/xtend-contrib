@@ -17,7 +17,7 @@ import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
  *
  * WARNING: This does not work yet due to an Xtend bug
  */
-@Active(typeof(DecoratorProcessor))
+@Active(DecoratorProcessor)
 annotation Decorator {
 	Class<?> value;
 }
@@ -30,7 +30,7 @@ class DecoratorProcessor extends AbstractClassProcessor {
 		//fails due to https://bugs.eclipse.org/bugs/show_bug.cgi?id=409600
 		//val forwarding = findTypeGlobally(typeof(Decorator))
 		//val iface = cls.findAnnotation(forwarding).getValue('value') as InterfaceDeclaration
-		val iface = typeof(CharSequence).findTypeGlobally as InterfaceDeclaration // dummy for testing
+		val iface = CharSequence.findTypeGlobally as InterfaceDeclaration // dummy for testing
 		cls.implementedInterfaces = cls.implementedInterfaces + #[iface.newTypeReference]
 		iface.declaredMethods.forEach [ declared |
 			if (!cls.hasExecutable(declared.signature)) {

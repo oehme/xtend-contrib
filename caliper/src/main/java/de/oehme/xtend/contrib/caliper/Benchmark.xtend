@@ -60,7 +60,7 @@ import static extension de.oehme.xtend.contrib.base.ASTExtensions.*
  * </p>
  * For more information, visit the <a href="https://code.google.com/p/caliper/">Caliper Website</a>.
  */
-@Active(typeof(BenchmarkProcessor))
+@Active(BenchmarkProcessor)
 annotation Benchmark {
 }
 
@@ -68,7 +68,7 @@ class BenchmarkProcessor extends AbstractClassProcessor {
 
 	override doTransform(MutableClassDeclaration benchmark, extension TransformationContext context) {
 		benchmark.final = true
-		benchmark.extendedClass = typeof(SimpleBenchmark).newTypeReference
+		benchmark.extendedClass = SimpleBenchmark.newTypeReference
 
 		benchmark.timedMethods.forEach [
 			addParameter("iterations", primitiveInt)
@@ -88,10 +88,10 @@ class BenchmarkProcessor extends AbstractClassProcessor {
 
 		benchmark.benchmarkParameters.forEach [ param |
 			benchmark.addField(param.simpleName.replace("Values", "")) [
-				addAnnotation(typeof(Param).findTypeGlobally)
+				addAnnotation(Param.findTypeGlobally)
 				type = param.propertyType.actualTypeArguments.get(0)
 			]
-			param.visibility = Visibility::DEFAULT
+			param.visibility = Visibility.DEFAULT
 			param.static = true
 		]
 
@@ -100,7 +100,7 @@ class BenchmarkProcessor extends AbstractClassProcessor {
 			addParameter("args", newArrayTypeReference(string))
 			body = [extension it|
 				'''
-					«typeof(Runner).newTypeReference.toJavaCode».main(«benchmark.simpleName».class, args);
+					«Runner.newTypeReference.toJavaCode».main(«benchmark.simpleName».class, args);
 				''']
 		]
 	}

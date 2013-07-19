@@ -12,7 +12,7 @@ class RecordBuilderExample {
 			addField(
 				new FieldBuilder("Bar") => [
 					rid
-					align = Align::LEFT
+					align = Align.LEFT
 					at = 50
 					defaultValue = "Baz"
 				]
@@ -25,7 +25,7 @@ class RecordBuilderExample {
 		new RecordBuilder("Foo") => [
 			addField("Bar") [
 				rid
-				align = Align::LEFT
+				align = Align.LEFT
 				at = 50
 				defaultValue = "Baz"
 			]

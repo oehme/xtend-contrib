@@ -39,15 +39,15 @@ import org.eclipse.xtext.common.types.JvmGenericType
  * 	}
  * }</pre>
  */
-@Target(ElementType::TYPE)
-@Active(typeof(FiresEventProcessor))
+@Target(ElementType.TYPE)
+@Active(FiresEventProcessor)
 annotation FiresEvent {
 	Class<?>[] value;
 }
 
 class FiresEventProcessor extends AbstractClassProcessor {
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
-		val annotationType = findTypeGlobally(typeof(FiresEvent))
+		val annotationType = findTypeGlobally(FiresEvent)
 
 		val valueObj = cls.findAnnotation(annotationType).getValue('value')
 		switch (valueObj) {
@@ -62,13 +62,13 @@ class FiresEventProcessor extends AbstractClassProcessor {
 
 	def addMethodsForType(JvmGenericType value, MutableClassDeclaration cls, extension TransformationContext context) {
 		val listenerType = newTypeReference(value.qualifiedName)
-		val arrListTypeRef = newTypeReference(typeof(ArrayList), listenerType)
+		val arrListTypeRef = newTypeReference(ArrayList, listenerType)
 		val _changeListeners = '_' + value.simpleName.toFirstLower + 's'
 		cls.addField(_changeListeners) [
-			type = newTypeReference(typeof(List), listenerType);
+			type = newTypeReference(List, listenerType);
 			initializer = ['''new «toJavaCode(arrListTypeRef)»()''']
 		]
-		val listenerClass = Class::forName(listenerType.name)
+		val listenerClass = Class.forName(listenerType.name)
 		listenerClass.declaredMethods.forEach [ method |
 			cls.addMethod('fire' + method.name.toFirstUpper) [ result |
 				method.parameterTypes.forEach [ param |

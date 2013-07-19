@@ -5,7 +5,7 @@ import org.eclipse.xtend.core.compiler.batch.XtendCompilerTester
 
 describe Decorator {
 	extension XtendCompilerTester compilerTester = XtendCompilerTester::newXtendCompilerTester(
-		typeof(Decorator)
+		Decorator
 	)
 
 	val example = '''
@@ -13,7 +13,7 @@ describe Decorator {
 		
 		import de.oehme.xtend.contrib.base.Decorator
 		
-		@Decorator(typeof(CharSequence))
+		@Decorator(CharSequence)
 		class BuggyCharSequence {
 			override char charAt(int i) {
 				delegate.charAt(i + 1)
@@ -23,13 +23,13 @@ describe Decorator {
 	
 	fact "the class implements the specified interface" {
 		example.compile[
-			getCompiledClass.interfaces should contain typeof(CharSequence)
+			getCompiledClass.interfaces should contain CharSequence
 		]
 	}
 	
 	facts "about the buggy char sequence" {
 		example.compile[
-			val CharSequence buggyFoo = getCompiledClass.getConstructor(typeof(CharSequence)).newInstance("Foo") as CharSequence
+			val CharSequence buggyFoo = getCompiledClass.getConstructor(CharSequence).newInstance("Foo") as CharSequence
 			buggyFoo.length should be 3
 			buggyFoo.toString should be "Foo"
 			buggyFoo.subSequence(0,2) should be "Fo"

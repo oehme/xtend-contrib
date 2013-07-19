@@ -37,18 +37,18 @@ class Window {
 			text = 'press ok'
 		]
 		val frame = new JFrame("Change test") => [
-			defaultCloseOperation = JFrame::EXIT_ON_CLOSE
+			defaultCloseOperation = JFrame.EXIT_ON_CLOSE
 			visible = true
 			size = new Dimension(300, 100)
 			locationRelativeTo = null //center
 			contentPane => [
-				add(textBox, BorderLayout::CENTER)
+				add(textBox, BorderLayout.CENTER)
 				add(
 					new JButton("OK") => [
 						addActionListener [
 							textBox.text = (new Date).toString
 						]
-					], BorderLayout::SOUTH)
+					], BorderLayout.SOUTH)
 			]
 		]
 

@@ -5,7 +5,7 @@ import org.eclipse.xtend.core.compiler.batch.XtendCompilerTester
 describe ExtractInterface {
 
 	extension XtendCompilerTester compilerTester = XtendCompilerTester::newXtendCompilerTester(
-		typeof(ExtractInterface)
+		ExtractInterface
 	)
 
 	val example = '''
@@ -43,7 +43,7 @@ describe ExtractInterface {
 		fact "declared exceptions are copied" {
 			example.compile[
 				val iface = getCompiledClass("foo.Foo")
-				iface.bar.exceptionTypes should contain typeof(Exception)
+				iface.bar.exceptionTypes should contain Exception
 			]
 		}
 
@@ -51,7 +51,7 @@ describe ExtractInterface {
 		fact "the return type is copied" {
 			example.compile[
 				val iface = getCompiledClass("foo.Foo")
-				iface.bar.returnType should be typeof(int)
+				iface.bar.returnType should be int
 			]
 		}
 		
@@ -63,6 +63,6 @@ describe ExtractInterface {
 		}
 		
 		def bar(Class<?> iface) {
-			iface.getMethod("bar", typeof(String), typeof(int[]))
+			iface.getMethod("bar", String, typeof(int[]))
 		}
 }
