@@ -21,12 +21,15 @@ annotation ValueObject {
 class ValueObjectProcessor extends AbstractClassProcessor {
 
 	override doRegisterGlobals(ClassDeclaration cls, RegisterGlobalsContext context) {
-		context.registerClass(cls.builderClassName)
+		if(!cls.compilationUnit.sourceTypeDeclarations.exists[qualifiedName == cls.builderClassName]) {
+			context.registerClass(cls.builderClassName)
+		}
 	}
 
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
 		val extension transformations = new CommonTransformations(context)
-		if(cls.extendedClass != object) cls.addError("Inheritance does not play well with immutability")
+		if(cls.extendedClass != object)
+			cls.addError("Inheritance does not play well with immutability")
 
 		cls.final = true
 		val builder = cls.builderClass(context) => [

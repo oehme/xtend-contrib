@@ -8,3 +8,9 @@ import de.oehme.xtend.contrib.base.ValueObject
 	String zip
 	String postOfficeBox
 }
+
+class AddressBuilder {
+	/*You can customize the builder if you want, 
+	* for instance add Annotations or convenience methods.
+	*/
+}
