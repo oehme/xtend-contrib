@@ -8,7 +8,7 @@
 
 	<groupId>de.oehme.xtend.contrib</groupId>
 	<artifactId>xtend-contrib-parent</artifactId>
-	<version>0.1.1</version>
+	<version>0.1.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2013</inceptionYear>
 	<name>Xtend Contrib</name>
@@ -21,7 +21,7 @@
 		<connection>scm:git:git://github.com/oehme/xtend-contrib.git</connection>
 		<developerConnection>scm:git:git@github.com:oehme/xtend-contrib.git</developerConnection>
 		<url>https://github.com/oehme/xtend-contrib</url>
-	  <tag>xtend-contrib-parent-0.1.1</tag>
+	  <tag>HEAD</tag>
   </scm>
 
 	<developers>
