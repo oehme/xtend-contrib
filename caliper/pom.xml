@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>de.oehme.xtend.contrib</groupId>
 		<artifactId>xtend-contrib-parent</artifactId>
-		<version>0.1.1-SNAPSHOT</version>
+		<version>0.1.1</version>
 	</parent>
 	<artifactId>xtend-contrib-caliper</artifactId>
 	<dependencies>
