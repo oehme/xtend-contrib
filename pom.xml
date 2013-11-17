@@ -108,5 +108,6 @@
 		<module>swing</module>
 		<module>examples</module>
 		<module>querydsl</module>
+		<module>jaxrs</module>
 	</modules>
 </project>
