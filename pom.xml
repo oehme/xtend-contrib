@@ -1,28 +1,29 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>de.oehme</groupId>
+		<groupId>com.github.oehme</groupId>
 		<artifactId>oss-java-parent</artifactId>
-		<version>3</version>
+		<version>4-SNAPSHOT</version>
 	</parent>
 
-	<groupId>de.oehme.xtend.contrib</groupId>
-	<artifactId>xtend-contrib-parent</artifactId>
+	<groupId>com.github.oehme.xtend</groupId>
+	<artifactId>xtend-contrib</artifactId>
 	<version>0.1.2-SNAPSHOT</version>
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
 	<inceptionYear>2013</inceptionYear>
 	<name>Xtend Contrib</name>
 	<description>
-		A collection of Xtend extension methods and active annotations
-		that make working with popular libraries even more fun.
+		Extension methods and active annotations that are useful in everyday development, but missing from xtend-core.
 	</description>
+	<url>https://github.com/oehme/xtend-contrib</url>
 
 	<scm>
 		<connection>scm:git:git://github.com/oehme/xtend-contrib.git</connection>
 		<developerConnection>scm:git:git@github.com:oehme/xtend-contrib.git</developerConnection>
 		<url>https://github.com/oehme/xtend-contrib</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 
 	<developers>
 		<developer>
@@ -59,8 +60,8 @@
 	</organization>
 
 	<properties>
-		<xtend.version>2.4.2</xtend.version>
-		<jnario.version>0.5.0</jnario.version>
+		<xtend.version>2.4.3</xtend.version>
+		<jnario.version>0.6.1</jnario.version>
 	</properties>
 
 	<dependencies>
@@ -69,16 +70,17 @@
 			<artifactId>org.eclipse.xtend.lib</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.xtend</groupId>
-			<artifactId>org.eclipse.xtend.standalone</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.jnario</groupId>
 			<artifactId>org.jnario.lib.maven</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.xtend</groupId>
+			<artifactId>org.eclipse.xtend.standalone</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -100,13 +102,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<modules>
-		<module>base</module>
-		<module>caliper</module>
-		<module>beanio</module>
-		<module>swing</module>
-		<module>examples</module>
-		<module>querydsl</module>
-	</modules>
 </project>
