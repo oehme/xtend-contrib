@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.oehme</groupId>
 		<artifactId>oss-java-parent</artifactId>
-		<version>4-SNAPSHOT</version>
+		<version>4</version>
 	</parent>
 
 	<groupId>com.github.oehme.xtend</groupId>
