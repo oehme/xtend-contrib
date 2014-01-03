@@ -11,7 +11,7 @@ describe ExtractInterface {
 	val example = '''
 		package foo
 
-		import de.oehme.xtend.contrib.base.ExtractInterface
+		import de.oehme.xtend.contrib.ExtractInterface
 
 		@ExtractInterface
 		class DefaultFoo {

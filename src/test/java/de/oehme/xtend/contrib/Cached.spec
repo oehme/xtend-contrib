@@ -16,7 +16,7 @@ describe Cached {
 
 	context "with no parameters"{
 		val example = '''
-			import de.oehme.xtend.contrib.base.Cached
+			import de.oehme.xtend.contrib.Cached
 			class Foo {
 				@Cached
 				def int bar() {
@@ -63,7 +63,7 @@ describe Cached {
 
 	context "with one parameter"{
 		val example = '''
-			import de.oehme.xtend.contrib.base.Cached
+			import de.oehme.xtend.contrib.Cached
 			class Foo {
 				@Cached
 				def Integer bar(String arg) {
@@ -115,7 +115,7 @@ describe Cached {
 
 	context "with multiple parameters" {
 		val example = '''
-			import de.oehme.xtend.contrib.base.Cached
+			import de.oehme.xtend.contrib.Cached
 			class Foo {
 				@Cached
 				def Integer bar(String arg1, Integer arg2) {

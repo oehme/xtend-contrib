@@ -12,7 +12,7 @@ describe ValueObject {
 		val example = '''
 			package foo
 
-			import de.oehme.xtend.contrib.base.ValueObject
+			import de.oehme.xtend.contrib.ValueObject
 
 			@ValueObject
 			class Thing {
@@ -91,7 +91,7 @@ describe ValueObject {
 		val example = '''
 			package foo
 
-			import de.oehme.xtend.contrib.base.ValueObject
+			import de.oehme.xtend.contrib.ValueObject
 
 			@ValueObject
 			class Thing {
