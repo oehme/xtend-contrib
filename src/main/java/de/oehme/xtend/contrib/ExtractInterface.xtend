@@ -8,7 +8,7 @@ import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.Visibility
 
-import static extension de.oehme.xtend.contrib.ASTExtensions.*
+import static extension de.oehme.xtend.contrib.macro.CommonQueries.*
 
 @Active(ExtractInterfaceProcessor)
 annotation ExtractInterface {
@@ -23,8 +23,7 @@ class ExtractInterfaceProcessor extends AbstractClassProcessor {
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
 		findInterface(cls.qualifiedInterfaceName) => [ iface |
 			cls.implementedInterfaces = cls.implementedInterfaces + #[iface.newTypeReference]
-			cls.declaredMethods.filter [visibility == Visibility.PUBLIC static == false]
-			.forEach [ method |
+			cls.declaredMethods.filter[visibility == Visibility.PUBLIC static == false].forEach [ method |
 				iface.addMethod(method.simpleName) [ extracted |
 					extracted.visibility = Visibility.PUBLIC
 					//TODO https://bugs.eclipse.org/bugs/show_bug.cgi?id=412361
@@ -39,16 +38,18 @@ class ExtractInterfaceProcessor extends AbstractClassProcessor {
 		]
 	}
 
-	def String qualifiedInterfaceName(ClassDeclaration cls) '''«cls.packageName».«cls.simpleInterfaceName»'''
+	def String qualifiedInterfaceName(ClassDeclaration cls) '''«cls.packageName».«cls.
+		simpleInterfaceName»'''
 
 	def simpleInterfaceName(ClassDeclaration cls) {
 		val simpleName = cls.simpleName
-		if (simpleName.startsWith("Default")) {
+		if(simpleName.startsWith("Default")) {
 			simpleName.substring(7)
-		} else if (simpleName.endsWith("Impl")) {
+		} else if(simpleName.endsWith("Impl")) {
 			simpleName.substring(0, simpleName.length - 4)
 		} else {
-			throw new IllegalArgumentException("Class name must start with 'Default' or end with 'Impl'")
+			throw new IllegalArgumentException(
+				"Class name must start with 'Default' or end with 'Impl'")
 		}
 	}
 }

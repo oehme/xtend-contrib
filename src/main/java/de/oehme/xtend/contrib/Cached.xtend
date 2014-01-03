@@ -5,12 +5,11 @@ import java.util.List
 import org.eclipse.xtend.lib.macro.Active
 import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.TransformationParticipant
-import org.eclipse.xtend.lib.macro.declaration.CompilationStrategy$CompilationContext
+import org.eclipse.xtend.lib.macro.declaration.CompilationStrategy.CompilationContext
 import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeReference
 import org.eclipse.xtext.xbase.lib.Exceptions
-
-import static extension de.oehme.xtend.contrib.ASTExtensions.*
+import de.oehme.xtend.contrib.macro.CommonTransformations
 
 /**
  * Caches invocations of a method. When the method is called multiple times with the same parameters, a cached result will be returned.
@@ -28,7 +27,8 @@ annotation Cached {
 }
 
 class MemoizeProcessor implements TransformationParticipant<MutableMethodDeclaration> {
-	override doTransform(List<? extends MutableMethodDeclaration> methods, extension TransformationContext context) {
+	override doTransform(List<? extends MutableMethodDeclaration> methods,
+		extension TransformationContext context) {
 		for (i : 0 ..< methods.size) {
 			val it = methods.get(i)
 			switch (parameters.size) {
@@ -43,12 +43,14 @@ class MemoizeProcessor implements TransformationParticipant<MutableMethodDeclara
 abstract class MethodMemoizer {
 
 	protected val extension TransformationContext context
+	protected val extension CommonTransformations transformations
 	protected val MutableMethodDeclaration method
 	protected val int index
 
 	new(MutableMethodDeclaration method, TransformationContext context, int index) {
 		this.method = method
 		this.context = context
+		this.transformations = new CommonTransformations(context)
 		this.index = index
 	}
 
@@ -104,7 +106,7 @@ class ParamterlessMethodMemoizer extends MethodMemoizer {
 	override protected cacheFieldInit(CompilationContext context) '''null'''
 
 	def lock() {
-		if (method.static) '''«method.declaringType.simpleName».class''' else "this"
+		if(method.static) '''«method.declaringType.simpleName».class''' else "this"
 	}
 }
 
@@ -118,7 +120,8 @@ abstract class ParametrizedMethodMemoizer extends MethodMemoizer {
 
 	override protected final cacheFieldInit(extension CompilationContext context) '''
 		com.google.common.cache.CacheBuilder.newBuilder()
-		.build(new com.google.common.cache.CacheLoader<«cacheKeyType.toJavaCode», «method.returnType.toJavaCode»>() {
+		.build(new com.google.common.cache.CacheLoader<«cacheKeyType.toJavaCode», «method.returnType.
+			toJavaCode»>() {
 			@Override
 			public «method.returnType.toJavaCode» load(«cacheKeyType.toJavaCode» key) throws Exception {
 				return «initMethodName»(«cacheKeyToParameters(context)»);
@@ -213,7 +216,7 @@ class CacheKey {
 	}
 
 	override equals(Object obj) {
-		if (obj instanceof CacheKey) {
+		if(obj instanceof CacheKey) {
 			return Arrays.equals(parameters, (obj as CacheKey).parameters)
 		}
 		false

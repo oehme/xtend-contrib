@@ -7,8 +7,8 @@ import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtext.xbase.lib.Procedures
-
-import static extension de.oehme.xtend.contrib.ASTExtensions.*
+import static extension de.oehme.xtend.contrib.macro.CommonQueries.*;
+import de.oehme.xtend.contrib.macro.CommonTransformations
 
 /**
  * Turns your class into an immutable value object with a builder, getters for all fields
@@ -60,7 +60,7 @@ class ValueObjectProcessor extends AbstractClassProcessor {
 		cls.addMethod("build") [
 			static = true
 			returnType = cls.newTypeReference
-			addParameter("init", Procedures$Procedure1.newTypeReference(builder.newTypeReference))
+			addParameter("init", Procedures.Procedure1.newTypeReference(builder.newTypeReference))
 			body = [
 				'''
 					«cls.builderClassName» builder = builder();
