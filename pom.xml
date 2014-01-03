@@ -9,7 +9,7 @@
 
 	<groupId>com.github.oehme.xtend</groupId>
 	<artifactId>xtend-contrib</artifactId>
-	<version>0.1.2-SNAPSHOT</version>
+	<version>0.4.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<inceptionYear>2013</inceptionYear>
 	<name>Xtend Contrib</name>
