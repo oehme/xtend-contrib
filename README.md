@@ -14,12 +14,12 @@ Convenience methods for writing active annotations
 There are some AST transformations that you tend to do a lot when writing active annotations.
 
 These include:
-    - adding an indirection to a method (for aspect oriented things like logging, caching etc.)
-    - implementing a method from an interface
-    - checking whether some method/constructor already exists
-    - adding simple toString/hashCode/equals methods
-    - adding simple constructors
-    - adding getters/setters for fields
+ - adding an indirection to a method (for aspect oriented things like logging, caching etc.)
+ - implementing a method from an interface
+ - checking whether some method/constructor already exists
+ - adding simple toString/hashCode/equals methods
+ - adding simple constructors
+ - adding getters/setters for fields
     
 All of these tasks are greatly simplified by the AstExtensions class in this library.
 
