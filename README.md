@@ -5,6 +5,12 @@ Since the xtend-core library is kept very small (for good reason), there are som
 
 [![Build Status](https://oehme.ci.cloudbees.com/job/xtend-contrib/badge/icon)](https://oehme.ci.cloudbees.com/job/xtend-contrib/)
 
+    <dependency>
+      <groupId>com.github.oehme.xtend</groupId>
+      <artifactId>xtend-contrib</artifactId>
+      <version>...</version>
+    </dependency>
+
 Features
 ========
 
@@ -77,19 +83,3 @@ There are times where you have only one sensible production implementation of a 
             "foobar"
         }
     }
-
-Including it in your build
-==========================
-
-To use it in your Maven build, please add the following repository to your settings.xml:
-
-    <repository>
-      <id>oehme-releases</id>
-      <url>https://repository-oehme.forge.cloudbees.com/release</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
