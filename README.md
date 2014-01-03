@@ -21,7 +21,12 @@ These include:
  - adding simple constructors
  - adding getters/setters for fields
     
-All of these tasks are greatly simplified by the AstExtensions class in this library.
+All of these tasks are greatly simplified by the CommonQueries and CommonTransformations classes in this library.
+
+@Synchronized, @Volatile and @StrictFp
+--------------------------------------
+
+These have the same effect as the Java keywords. Xtend doesn't have these keywords, so use these annotations instead.
 
 
 @Cached
