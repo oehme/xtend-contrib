@@ -2,3 +2,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'xtend'
 apply plugin: 'jnario'
+
+dependencies {
+  compile 'com.google.guava:guava:15.0'
+}
