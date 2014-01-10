@@ -7,7 +7,7 @@ repositories {
 dependencies {
   compile gradleApi()
   compile localGroovy()
-  compile 'org.eclipse.xtend:org.eclipse.xtend.standalone:2.4.3'
-  compile 'org.jnario:org.jnario.standalone.maven:0.6.1'
+  compile 'org.eclipse.xtend:org.eclipse.xtend.standalone:2.4.2'
+  compile 'org.jnario:org.jnario.standalone.maven:0.5.1'
   compile 'org.pegdown:pegdown:1.4.2'
 }

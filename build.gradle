@@ -5,4 +5,5 @@ apply plugin: 'jnario'
 
 dependencies {
   compile 'com.google.guava:guava:15.0'
+  testCompile 'org.hamcrest:hamcrest-all:1.3'
 }
