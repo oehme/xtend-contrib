@@ -1,6 +1,7 @@
 package xtend;
 
 import org.gradle.api.*;
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.*;
 import org.apache.log4j.BasicConfigurator
 import org.eclipse.xtend.core.XtendStandaloneSetup
@@ -32,37 +33,37 @@ class XtendPlugin implements Plugin<Project> {
 			}
 		}
 		project.task('compileXtend', type: CompileXtendTask) {
-			xtendSrcDir = project.file('src/main/java')
-			xtendGenTargetDir = project.file('src/main/xtend-gen')
+			srcDir = project.file('src/main/java')
+			targetDir = project.file('src/main/xtend-gen')
+			classpath = project.sourceSets.main.compileClasspath
 		}
 		project.tasks.compileJava.dependsOn('compileXtend')
 		project.task('compileTestXtend', type: CompileXtendTask) {
-			xtendSrcDir = project.file('src/test/java')
-			xtendGenTargetDir = project.file('src/test/xtend-gen')
+			srcDir = project.file('src/test/java')
+			targetDir = project.file('src/test/xtend-gen')
+			classpath = project.sourceSets.test.compileClasspath
 		}
 		project.tasks.compileTestJava.dependsOn('compileTestXtend')
-    project.tasks.clean.dependsOn('cleanCompileXtend', 'cleanCompileTestXtend')
+		project.tasks.clean.dependsOn('cleanCompileXtend', 'cleanCompileTestXtend')
 	}
 }
 
 class CompileXtendTask extends DefaultTask {
 	@InputDirectory
-	def File xtendSrcDir
+	def File srcDir
+
+	@InputFiles
+	def FileCollection classpath
 
 	@OutputDirectory
-	def File xtendGenTargetDir
+	def File targetDir
 
 	@TaskAction
 	def compile() {
-		def srcPath = xtendSrcDir.absolutePath
-		def targetPath = xtendGenTargetDir.absolutePath
-		def classpath = project.configurations.compile.asPath
-
-		BasicConfigurator.configure()
 		XtendBatchCompiler compiler = new XtendStandaloneSetup().createInjectorAndDoEMFRegistration().getInstance(XtendBatchCompiler.class)
-		compiler.setOutputPath(targetPath)
-		compiler.setClassPath(classpath)
-		compiler.setSourcePath(srcPath)
+		compiler.setOutputPath(targetDir.absolutePath)
+		compiler.setClassPath(classpath.asPath)
+		compiler.setSourcePath(srcDir.absolutePath)
 		compiler.setFileEncoding("UTF-8")
 		if (!compiler.compile()) {
 			throw new GradleException("Xtend compilation failed.");

@@ -28,7 +28,7 @@ class JnarioPlugin implements Plugin<Project> {
 			it.dependsOn("compileTestXtend")
 		}
 		project.tasks.compileTestJava.dependsOn('compileTestJnario')
-    project.tasks.clean.dependsOn('cleanCompileTestJnario')
+		project.tasks.clean.dependsOn('cleanCompileTestJnario')
 	}
 }
 
@@ -41,13 +41,10 @@ class CompileJnarioTask extends DefaultTask {
 
 	@TaskAction
 	def compile() {
-		def srcPath = srcDir.absolutePath
-		def targetPath = targetDir.absolutePath
-		def classpath = project.configurations.testCompile.asPath
 		def compiler = new CompilerMain()
-		compiler.sourcePath = srcPath
-		compiler.outputPath = targetPath
-		compiler.classPath = classpath
+		compiler.sourcePath = srcDir.absolutePath
+		compiler.outputPath = targetDir.absolutePath
+		compiler.classPath = project.sourceSets.test.compileClasspath.asPath
 		if (compiler.compile() != CompilerMain.OK) {
 			throw new GradleException("Jnario compilation failed")
 		}
