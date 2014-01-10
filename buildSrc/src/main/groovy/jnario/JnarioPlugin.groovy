@@ -28,6 +28,7 @@ class JnarioPlugin implements Plugin<Project> {
 			it.dependsOn("compileTestXtend")
 		}
 		project.tasks.compileTestJava.dependsOn('compileTestJnario')
+    project.tasks.clean.dependsOn('cleanCompileTestJnario')
 	}
 }
 

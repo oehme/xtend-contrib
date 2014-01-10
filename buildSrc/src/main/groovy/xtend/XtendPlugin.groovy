@@ -41,6 +41,7 @@ class XtendPlugin implements Plugin<Project> {
 			xtendGenTargetDir = project.file('src/test/xtend-gen')
 		}
 		project.tasks.compileTestJava.dependsOn('compileTestXtend')
+    project.tasks.clean.dependsOn('cleanCompileXtend', 'cleanCompileTestXtend')
 	}
 }
 
