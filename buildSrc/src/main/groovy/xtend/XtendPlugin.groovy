@@ -10,8 +10,8 @@ class XtendPlugin implements Plugin<Project> {
 	void apply(Project project) {
 		project.repositories { mavenCentral() }
 		project.dependencies {
-			compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.4.2'
-			testCompile 'org.eclipse.xtend:org.eclipse.xtend.standalone:2.4.2'
+			compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.4.3'
+			testCompile 'org.eclipse.xtend:org.eclipse.xtend.standalone:2.4.3'
 		}
 		project.sourceSets {
 			main {
