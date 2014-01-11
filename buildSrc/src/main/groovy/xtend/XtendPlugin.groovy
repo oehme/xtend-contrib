@@ -11,8 +11,12 @@ class XtendPlugin implements Plugin<Project> {
 	void apply(Project project) {
 		project.repositories { mavenCentral() }
 		project.dependencies {
-			compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.4.2'
-			testCompile 'org.eclipse.xtend:org.eclipse.xtend.standalone:2.4.2'
+			compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.5.0'
+      testCompile ('org.eclipse.xtend:org.eclipse.xtend.core:2.5.0') {
+        exclude group: 'org.eclipse.emf', module: 'org.eclipse.emf.codegen'
+       }
+      //workaround for non-resolvable version in Xtext's transitive dependencies
+      testCompile 'org.eclipse.emf:org.eclipse.emf.codegen:2.9.0-v20130902-0605'
 		}
 		project.sourceSets {
 			main {
