@@ -8,7 +8,7 @@ import org.apache.log4j.BasicConfigurator
 class JnarioPlugin implements Plugin<Project> {
 	void apply(Project project) {
 		project.repositories { mavenCentral() }
-		project.dependencies { testCompile 'org.jnario:org.jnario.lib.maven:0.7.0' }
+		project.dependencies { testCompile 'org.jnario:org.jnario.lib.maven:0.7.1' }
 		project.sourceSets {
 			test {
 				java {

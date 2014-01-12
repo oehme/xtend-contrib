@@ -61,7 +61,7 @@
 
 	<properties>
 		<xtend.version>2.5.0</xtend.version>
-		<jnario.version>0.7.0</jnario.version>
+		<jnario.version>0.7.1</jnario.version>
 	</properties>
 
 	<dependencies>
@@ -96,6 +96,12 @@
 			<plugin>
 				<groupId>org.eclipse.xtend</groupId>
 				<artifactId>xtend-maven-plugin</artifactId>
+			</plugin>
+      <plugin>
+				<artifactId>maven-enforcer-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.jnario</groupId>
