@@ -10,6 +10,8 @@ import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeReference
 import org.eclipse.xtext.xbase.lib.Exceptions
 import de.oehme.xtend.contrib.macro.CommonTransformations
+import org.eclipse.xtend.lib.macro.declaration.MethodDeclaration
+import org.eclipse.xtend.lib.macro.declaration.ParameterDeclaration
 
 /**
  * Caches invocations of a method. When the method is called multiple times with the same parameters, a cached result will be returned.
@@ -22,36 +24,45 @@ import de.oehme.xtend.contrib.macro.CommonTransformations
  * 	<li>The method is referentially transparent (has no externally visible side effects)</li>
  * </ul>
  */
-@Active(MemoizeProcessor)
+@Active(CachedProcessor)
 annotation Cached {
 }
 
-class MemoizeProcessor implements TransformationParticipant<MutableMethodDeclaration> {
+class CachedProcessor implements TransformationParticipant<MutableMethodDeclaration> {
+
+	/**
+	 * This allows you to get the name of the cache field that will be generated for a cached method. This way you can write your own active annotations that add additional features for cached methods.
+	 */
+	static def String cacheFieldName(MethodDeclaration method) {
+		'''_cache_«method.simpleName»«IF !method.parameters.empty»_«method.parameters.join("_")[
+			fieldFriendlyName]»«ENDIF»'''
+	}
+
+	private def static fieldFriendlyName(ParameterDeclaration it) {
+		type.type.qualifiedName.replaceAll("\\.", "_")
+	}
+
 	override doTransform(List<? extends MutableMethodDeclaration> methods,
 		extension TransformationContext context) {
-		for (i : 0 ..< methods.size) {
-			val it = methods.get(i)
+		methods.forEach [
 			switch (parameters.size) {
-				case 0: new ParamterlessMethodMemoizer(it, context, i).generate
-				case 1: new SingleParameterMethodMemoizer(it, context, i).generate
-				default: new MultipleParameterMethodMemoizer(it, context, i).generate
+				case 0: new ParamterlessMethodMemoizer(it, context).generate
+				case 1: new SingleParameterMethodMemoizer(it, context).generate
+				default: new MultipleParameterMethodMemoizer(it, context).generate
 			}
-		}
+		]
 	}
 }
 
 abstract class MethodMemoizer {
-
 	protected val extension TransformationContext context
 	protected val extension CommonTransformations transformations
 	protected val MutableMethodDeclaration method
-	protected val int index
 
-	new(MutableMethodDeclaration method, TransformationContext context, int index) {
+	new(MutableMethodDeclaration method, TransformationContext context) {
 		this.method = method
 		this.context = context
 		this.transformations = new CommonTransformations(context)
-		this.index = index
 	}
 
 	def final generate() {
@@ -70,7 +81,9 @@ abstract class MethodMemoizer {
 
 	def protected final String initMethodName() '''«method.simpleName»_init'''
 
-	def protected final String cacheFieldName() '''cache«index»_«method.simpleName»'''
+	def protected final String cacheFieldName() {
+		CachedProcessor.cacheFieldName(method)
+	}
 
 	def protected CharSequence cacheCall(CompilationContext context)
 
@@ -84,8 +97,8 @@ abstract class MethodMemoizer {
  */
 class ParamterlessMethodMemoizer extends MethodMemoizer {
 
-	new(MutableMethodDeclaration method, TransformationContext context, int index) {
-		super(method, context, index)
+	new(MutableMethodDeclaration method, TransformationContext context) {
+		super(method, context)
 	}
 
 	override protected cacheCall(extension CompilationContext context) '''
@@ -114,8 +127,8 @@ class ParamterlessMethodMemoizer extends MethodMemoizer {
  * Uses Guava's LoadingCache to store the return value for each combination of parameters
  */
 abstract class ParametrizedMethodMemoizer extends MethodMemoizer {
-	new(MutableMethodDeclaration method, TransformationContext context, int index) {
-		super(method, context, index)
+	new(MutableMethodDeclaration method, TransformationContext context) {
+		super(method, context)
 	}
 
 	override protected final cacheFieldInit(extension CompilationContext context) '''
@@ -160,8 +173,8 @@ abstract class ParametrizedMethodMemoizer extends MethodMemoizer {
 }
 
 class SingleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
-	new(MutableMethodDeclaration method, TransformationContext context, int index) {
-		super(method, context, index)
+	new(MutableMethodDeclaration method, TransformationContext context) {
+		super(method, context)
 	}
 
 	override protected cacheKeyToParameters(CompilationContext context) '''key'''
@@ -180,8 +193,8 @@ class SingleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
 }
 
 class MultipleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
-	new(MutableMethodDeclaration method, TransformationContext context, int index) {
-		super(method, context, index)
+	new(MutableMethodDeclaration method, TransformationContext context) {
+		super(method, context)
 	}
 
 	override protected cacheKeyToParameters(extension CompilationContext context) {

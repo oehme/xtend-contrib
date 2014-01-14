@@ -7,6 +7,7 @@ import org.eclipse.xtext.xbase.lib.Exceptions
 import static org.hamcrest.Matchers.*
 
 import static extension java.lang.reflect.Modifier.*
+import java.util.List
 
 describe Cached {
 
@@ -43,7 +44,7 @@ describe Cached {
 
 		facts "about the cache field" {
 			example.compile[
-				val cacheField = compiledClass.getDeclaredField("cache0_bar")
+				val cacheField = compiledClass.getDeclaredField("_cache_bar")
 				cacheField.type should be Integer
 				assert cacheField.modifiers.private
 			]
@@ -64,24 +65,25 @@ describe Cached {
 	context "with one parameter"{
 		val example = '''
 			import de.oehme.xtend.contrib.Cached
+			import java.util.List
 			class Foo {
 				@Cached
-				def Integer bar(String arg) {
-					new Integer(arg.length)
+				def Integer bar(List<String> arg) {
+					arg.size
 				}
 			}
 		'''
 
 		facts "about the outer method" {
 			example.compile[
-				val outerMethod = compiledClass.getDeclaredMethod("bar", String)
+				val outerMethod = compiledClass.getDeclaredMethod("bar", List)
 				outerMethod.returnType should be Integer
 			]
 		}
 
 		facts "about the init method" {
 			example.compile[
-				val initMethod = compiledClass.getDeclaredMethod("bar_init", String)
+				val initMethod = compiledClass.getDeclaredMethod("bar_init", List)
 				initMethod.returnType should be Integer
 				assert initMethod.modifiers.private
 			]
@@ -89,7 +91,7 @@ describe Cached {
 
 		facts "about the cache field" {
 			example.compile[
-				val cacheField = compiledClass.getDeclaredField("cache0_bar")
+				val cacheField = compiledClass.getDeclaredField("_cache_bar_java_util_List")
 				cacheField.type should be LoadingCache
 				assert cacheField.modifiers.private
 			]
@@ -99,11 +101,11 @@ describe Cached {
 			example.compile[
 				val cls = compiledClass
 				val foo = cls.newInstance
-				val bar = cls.getMethod("bar", String)
+				val bar = cls.getMethod("bar", List)
 
-				val first = bar.invoke(foo, "a")
-				val second = bar.invoke(foo, "a")
-				val third = bar.invoke(foo, "aa")
+				val first = bar.invoke(foo, #[#["a"]])
+				val second = bar.invoke(foo, #[#["a"]])
+				val third = bar.invoke(foo, #[#["a", "b"]])
 
 				first should be 1
 				second should be 1
@@ -141,7 +143,7 @@ describe Cached {
 
 		facts "about the cache field" {
 			example.compile[
-				val cacheField = compiledClass.getDeclaredField("cache0_bar")
+				val cacheField = compiledClass.getDeclaredField("_cache_bar_java_lang_String_java_lang_Integer")
 				cacheField.type should be LoadingCache
 				assert cacheField.modifiers.private
 			]
