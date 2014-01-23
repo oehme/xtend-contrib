@@ -83,3 +83,5 @@ There are times where you have only one sensible production implementation of a 
             "foobar"
         }
     }
+
+![](http://www.cloudbees.com/sites/default/files/Button-Built-on-CB-1.png)
