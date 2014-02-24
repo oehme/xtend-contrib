@@ -67,6 +67,10 @@ abstract class MethodMemoizer {
 
 	def final generate() {
 		method => [
+			if (returnType.inferred) {
+				addError("Please explicitly specify the return type")
+        return
+			}
 			returnType = returnType.wrapperIfPrimitive
 			addIndirection(initMethodName)[cacheCall]
 			declaringType => [

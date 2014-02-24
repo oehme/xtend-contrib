@@ -13,6 +13,7 @@ import org.gradle.plugins.ide.eclipse.EclipsePlugin
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.jnario.compiler.CompilerMain
 
+import xtend.XtendCompilerMain
 import xtend.XtendPlugin
 
 class JnarioPlugin implements Plugin<Project> {
@@ -26,7 +27,7 @@ class JnarioPlugin implements Plugin<Project> {
 
 	void apply(Project project) {
 		project.repositories { mavenCentral() }
-		project.dependencies { testCompile 'org.jnario:org.jnario.lib.maven:0.7.1' }
+		project.dependencies { testCompile 'org.jnario:org.jnario.lib.maven:0.7.2' }
 
 		project.plugins.apply(XtendPlugin)
 
@@ -70,17 +71,40 @@ class JnarioCompile extends DefaultTask {
 	FileCollection classpath
 
 	@OutputDirectory
-	def File targetDir
+	File targetDir
+
+	@Input
+	boolean useDaemon
 
 	@TaskAction
 	def compile() {
-		def compiler = new CompilerMain()
 		def sourcePath = srcDirs.srcDirTrees.collect{it.dir.absolutePath}.join(File.pathSeparator)
-		compiler.sourcePath = sourcePath
-		compiler.outputPath = targetDir.absolutePath
-		compiler.classPath = classpath.asPath
-		if (compiler.compile() != CompilerMain.OK) {
-			throw new GradleException("Jnario compilation failed")
+		def args = [
+			XtendCompilerMain.CLASSPATH_OPTION,
+			classpath.asPath,
+			XtendCompilerMain.SOURCE_OPTION,
+			sourcePath,
+			XtendCompilerMain.OUTPUT_OPTION,
+			targetDir.absolutePath
+		]
+		if (useDaemon) {
+			compileWithDaemon(args)
+		} else {
+			compileWithoutDaemon(args)
+		}
+	}
+	
+	def compileWithoutDaemon(args) {
+		JnarioCompilerMain.main(args as String[]);
+	}
+
+	def compileWithDaemon(args) {
+		def client = new JnarioCompilerClient();
+		def runtimeClasspath = getClass().getClassLoader().getURLs().collect{it.getFile().toString()}.join(File.pathSeparator)
+		client.requireServer(runtimeClasspath);
+		
+		if (!client.compile(args)) {
+			throw new GradleException("Jnario compilation failed.")
 		}
 	}
 }

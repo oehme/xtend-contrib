@@ -7,4 +7,5 @@ apply plugin: 'findbugs'
 dependencies {
   compile 'com.google.guava:guava:15.0'
   testCompile 'org.hamcrest:hamcrest-all:1.3'
+  xtend 'org.eclipse.xtend:org.eclipse.xtend.core:2.5.2'
 }

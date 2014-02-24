@@ -33,13 +33,10 @@ class XtendPlugin implements Plugin<Project> {
 		 */
 		project.repositories { mavenCentral() }
 		project.dependencies {
-			compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.5.0'
-			testCompile ('org.eclipse.xtend:org.eclipse.xtend.core:2.5.0') {
-				exclude group: 'org.eclipse.emf', module: 'org.eclipse.emf.codegen'
-			}
-			//workaround for non-resolvable version in Xtext's transitive dependencies
-			testCompile 'org.eclipse.emf:org.eclipse.emf.codegen:2.9.0-v20130902-0605'
+			compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.5.2'
+			testCompile 'org.eclipse.xtend:org.eclipse.xtend.core:2.5.2'
 		}
+		project.configurations.create("xtend")
 
 		project.plugins.apply(JavaPlugin)
 		JavaPluginConvention java = project.convention.getPlugin(JavaPluginConvention)
@@ -78,15 +75,36 @@ class XtendCompile extends DefaultTask {
 	@OutputDirectory
 	File targetDir
 
+	@Input
+	boolean useDaemon
+
 	@TaskAction
 	def compile() {
-		XtendBatchCompiler compiler = new XtendStandaloneSetup().createInjectorAndDoEMFRegistration().getInstance(XtendBatchCompiler.class)
-		compiler.setOutputPath(targetDir.absolutePath)
-		compiler.setClassPath(classpath.asPath)
 		def sourcePath = srcDirs.srcDirTrees.collect{it.dir.absolutePath}.join(File.pathSeparator)
-		compiler.setSourcePath(sourcePath)
-		compiler.setFileEncoding("UTF-8")
-		if (!compiler.compile()) {
+		def args = [
+			XtendCompilerMain.CLASSPATH_OPTION,
+			classpath.asPath,
+			XtendCompilerMain.SOURCE_OPTION,
+			sourcePath,
+			XtendCompilerMain.OUTPUT_OPTION,
+			targetDir.absolutePath
+		]
+		if (useDaemon) {
+			compileWithDaemon(args)
+		} else {
+			compileWithoutDaemon(args)
+		}
+	}
+
+	private compileWithoutDaemon(args) {
+		XtendCompilerMain.main(args as String[]);
+	}
+
+	private compileWithDaemon(args) {
+		def client = new XtendCompilerClient();
+		def runtimeClasspath = getClass().getClassLoader().getURLs().collect{it.getFile().toString()}.join(File.pathSeparator)
+		client.requireServer(runtimeClasspath);
+		if (!client.compile(args)) {
 			throw new GradleException("Xtend compilation failed.")
 		}
 	}

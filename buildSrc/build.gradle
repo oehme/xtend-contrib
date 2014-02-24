@@ -7,11 +7,9 @@ repositories {
 dependencies {
   compile gradleApi()
   compile localGroovy()
-  compile ('org.eclipse.xtend:org.eclipse.xtend.core:2.5.0') {
-    exclude group: 'org.eclipse.emf', module: 'org.eclipse.emf.codegen'
-  }
-  //workaround for non-resolvable version in Xtext's transitive dependencies
-  compile 'org.eclipse.emf:org.eclipse.emf.codegen:2.9.0-v20130902-0605'
-  compile 'org.jnario:org.jnario.standalone.maven:0.7.1'
+  compile 'com.martiansoftware:nailgun-server:0.9.1'
+  compile 'com.typesafe.zinc:zinc:0.3.0'
+  compile 'org.eclipse.xtend:org.eclipse.xtend.core:2.5.2'
+  compile 'org.jnario:org.jnario.standalone.maven:0.7.2'
   compile 'org.pegdown:pegdown:1.4.2'
 }

@@ -14,6 +14,20 @@ describe Cached {
 	extension XtendCompilerTester compilerTester = XtendCompilerTester::newXtendCompilerTester(
 		Cached, LoadingCache, Exceptions
 	)
+  
+  context "with implicit return type"{
+		val example = '''
+			import de.oehme.xtend.contrib.Cached
+			class Foo {
+				@Cached
+				def bar() {
+					1
+				}
+			}
+		'''
+    
+    fact example.compile[] throws Exception
+   }
 
 	context "with no parameters"{
 		val example = '''
