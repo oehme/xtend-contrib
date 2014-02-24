@@ -24,9 +24,6 @@ class JnarioPlugin implements Plugin<Project> {
 	}
 
 	void apply(Project project) {
-		project.repositories { mavenCentral() }
-		project.dependencies { testCompile 'org.jnario:org.jnario.lib.maven:0.7.2' }
-
 		project.configurations.create("jnario")
 
 		project.plugins.apply(XtendPlugin)

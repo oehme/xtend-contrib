@@ -4,9 +4,16 @@ apply plugin: 'xtend'
 apply plugin: 'jnario'
 apply plugin: 'findbugs'
 
+repositories {
+	mavenCentral()
+}
+
 dependencies {
   compile 'com.google.guava:guava:15.0'
+  compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.5.2'
   testCompile 'org.hamcrest:hamcrest-all:1.3'
+  testCompile 'org.jnario:org.jnario.lib.maven:0.7.2'
+  testCompile 'org.eclipse.xtend:org.eclipse.xtend.core:2.5.2'
   
   xtend 'org.eclipse.xtend:org.eclipse.xtend.core:2.5.2'
   //this is a bug, xtend.core should depend on xtend.lib

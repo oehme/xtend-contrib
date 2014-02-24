@@ -24,14 +24,6 @@ class XtendPlugin implements Plugin<Project> {
 	}
 
 	void apply(Project project) {
-		/*TODO do not add repositories or dependencies, the user should decide himself which Xtend version he wants to use. 
-		 *Instead, discover the Xtend version and fetch the corresponding compiler.
-		 */
-		project.repositories { mavenCentral() }
-		project.dependencies {
-			compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.5.2'
-			testCompile 'org.eclipse.xtend:org.eclipse.xtend.core:2.5.2'
-		}
 		project.configurations.create("xtend")
 
 		project.plugins.apply(JavaPlugin)
