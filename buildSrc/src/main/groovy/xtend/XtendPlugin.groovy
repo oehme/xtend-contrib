@@ -43,6 +43,9 @@ class XtendPlugin implements Plugin<Project> {
 				it.classpath = sourceSet.compileClasspath
 				it.setDescription("Compiles the ${sourceSet.getName()} Xtend sources")
 			}
+			compileTask.conventionMapping.map("encoding") {
+				project.extensions.xtend.encoding ?: "UTF-8"
+			}
 			project.tasks[sourceSet.compileJavaTaskName].dependsOn(compileTask)
 			project.tasks["clean"].dependsOn("clean" + compileTaskName.capitalize())
 		}
@@ -64,18 +67,14 @@ class XtendCompile extends DefaultTask {
 	@OutputDirectory
 	File targetDir
 
+	@Input
 	String encoding
 
 	@TaskAction
 	def compile() {
-		if (encoding == null) {
-			encoding = project.extensions.xtend.encoding
-			if (encoding == null) {
-				encoding = "UTF-8"
-			}
-		}
-		def sourcePath = srcDirs.srcDirTrees.collect{it.dir.absolutePath}.join(File.pathSeparator)
-		def process = Runtime.runtime.exec("java -cp ${project.configurations.xtend.asPath} org.eclipse.xtend.core.compiler.batch.Main -cp ${classpath.asPath} -d ${targetDir.absolutePath} -encoding ${encoding} ${sourcePath}")
+		def sourcePath = getSrcDirs().srcDirTrees.collect{it.dir.absolutePath}.join(File.pathSeparator)
+		println(getEncoding())
+		def process = Runtime.runtime.exec("java -cp ${project.configurations.xtend.asPath} org.eclipse.xtend.core.compiler.batch.Main -cp ${getClasspath().asPath} -d ${getTargetDir().absolutePath} -encoding ${getEncoding()} ${sourcePath}")
 		def exitCode = process.waitFor()
 		if (exitCode != 0) {
 			throw new GradleException("Xtend Compilation failed");
