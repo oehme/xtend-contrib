@@ -26,3 +26,7 @@ dependencies {
 	  exclude group:"org.ow2.asm"
   }
 }
+
+xtend {
+  encoding = "UTF-8"
+}
