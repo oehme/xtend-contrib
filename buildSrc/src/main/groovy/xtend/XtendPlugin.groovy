@@ -13,10 +13,6 @@ import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.*;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.eclipse.model.EclipseModel;
-import org.apache.log4j.BasicConfigurator
-import org.eclipse.xtend.core.XtendStandaloneSetup
-import org.eclipse.xtend.core.compiler.XtendCompiler;
-import org.eclipse.xtend.core.compiler.batch.XtendBatchCompiler
 
 class XtendPlugin implements Plugin<Project> {
 
@@ -75,37 +71,13 @@ class XtendCompile extends DefaultTask {
 	@OutputDirectory
 	File targetDir
 
-	@Input
-	boolean useDaemon
-
 	@TaskAction
 	def compile() {
 		def sourcePath = srcDirs.srcDirTrees.collect{it.dir.absolutePath}.join(File.pathSeparator)
-		def args = [
-			XtendCompilerMain.CLASSPATH_OPTION,
-			classpath.asPath,
-			XtendCompilerMain.SOURCE_OPTION,
-			sourcePath,
-			XtendCompilerMain.OUTPUT_OPTION,
-			targetDir.absolutePath
-		]
-		if (useDaemon) {
-			compileWithDaemon(args)
-		} else {
-			compileWithoutDaemon(args)
-		}
-	}
-
-	private compileWithoutDaemon(args) {
-		XtendCompilerMain.main(args as String[]);
-	}
-
-	private compileWithDaemon(args) {
-		def client = new XtendCompilerClient();
-		def runtimeClasspath = getClass().getClassLoader().getURLs().collect{it.getFile().toString()}.join(File.pathSeparator)
-		client.requireServer(runtimeClasspath);
-		if (!client.compile(args)) {
-			throw new GradleException("Xtend compilation failed.")
+		def process = Runtime.runtime.exec("java -cp ${project.configurations.xtend.asPath} org.eclipse.xtend.core.compiler.batch.Main -cp ${classpath.asPath} -d ${targetDir.absolutePath} -encoding UTF-8 ${sourcePath}")
+		def exitCode = process.waitFor()
+		if (exitCode != 0) {
+			throw new GradleException("Xtend Compilation failed");
 		}
 	}
 }
