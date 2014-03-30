@@ -8,7 +8,7 @@
 
 	<groupId>com.github.oehme.xtend</groupId>
 	<artifactId>xtend-contrib</artifactId>
-	<version>0.4.4</version>
+	<version>0.4.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<inceptionYear>2013</inceptionYear>
 	<name>Xtend Contrib</name>
@@ -21,7 +21,7 @@
 		<connection>scm:git:git://github.com/oehme/xtend-contrib.git</connection>
 		<developerConnection>scm:git:git@github.com:oehme/xtend-contrib.git</developerConnection>
 		<url>https://github.com/oehme/xtend-contrib</url>
-		<tag>xtend-contrib-0.4.4</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<developers>
