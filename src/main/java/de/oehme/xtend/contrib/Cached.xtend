@@ -76,6 +76,7 @@ abstract class MethodMemoizer {
 			declaringType => [
 				addField(cacheFieldName) [
 					static = method.static
+          transient = true
 					type = cacheFieldType
 					initializer = [cacheFieldInit]
 				]
