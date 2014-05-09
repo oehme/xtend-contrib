@@ -57,7 +57,7 @@ class CommonTransformations {
 			body = [extension ctx|
 				'''
 					return «guavaObjects.toJavaCode».toStringHelper(«cls.simpleName».class)
-					«FOR a : cls.declaredFields»
+					«FOR a : cls.persistentState»
 						.add("«a.simpleName»",«a.simpleName»)
 					«ENDFOR»
 					.toString();
