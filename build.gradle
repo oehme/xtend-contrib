@@ -3,7 +3,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'org.xtend:xtend-gradle-plugin:0.0.4'
+    classpath 'org.xtend:xtend-gradle-plugin:0.0.7'
   }
 }
 
@@ -15,5 +15,9 @@ repositories {
 
 dependencies {
   compile 'com.google.guava:guava:15.0'
-  compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.5.2'
+  compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.5.4'
+}
+
+task areWeFreeOfASM3 << {
+  println(project.compileXtend.xtendClasspath.grep{it.name.contains("asm-3")}.isEmpty())
 }

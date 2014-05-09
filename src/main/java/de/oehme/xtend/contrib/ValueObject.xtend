@@ -79,6 +79,7 @@ class ValueObjectProcessor extends AbstractClassProcessor {
 
 		cls.persistentState.forEach [ field |
 			field.addGetter
+			field.markAsRead
 		]
 
 		if(!cls.hasDataConstructor) cls.addDataConstructor
