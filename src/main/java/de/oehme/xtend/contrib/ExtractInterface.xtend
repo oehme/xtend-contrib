@@ -1,5 +1,9 @@
 package de.oehme.xtend.contrib
 
+import java.lang.annotation.ElementType
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
+import java.lang.annotation.Target
 import org.eclipse.xtend.lib.macro.AbstractClassProcessor
 import org.eclipse.xtend.lib.macro.Active
 import org.eclipse.xtend.lib.macro.RegisterGlobalsContext
@@ -10,6 +14,8 @@ import org.eclipse.xtend.lib.macro.declaration.Visibility
 
 import static extension de.oehme.xtend.contrib.macro.CommonQueries.*
 
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 @Active(ExtractInterfaceProcessor)
 annotation ExtractInterface {
 }

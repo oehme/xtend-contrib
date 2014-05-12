@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.github.oehme</groupId>
@@ -95,12 +96,16 @@
 			<plugin>
 				<groupId>org.eclipse.xtend</groupId>
 				<artifactId>xtend-maven-plugin</artifactId>
+				<configuration>
+					<outputDirectory>${project.build.directory}/src-gen/main/java</outputDirectory>
+					<testOutputDirectory>${project.build.directory}/src-gen/test/java</testOutputDirectory>
+				</configuration>
 			</plugin>
-      <plugin>
+			<plugin>
 				<artifactId>maven-enforcer-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.jnario</groupId>

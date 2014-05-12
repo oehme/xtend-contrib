@@ -1,5 +1,6 @@
 package de.oehme.xtend.contrib.macro
 
+import com.google.common.base.Objects
 import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.CompilationStrategy
 import org.eclipse.xtend.lib.macro.declaration.MethodDeclaration
@@ -7,6 +8,7 @@ import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableFieldDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.Visibility
+import org.eclipse.xtend2.lib.StringConcatenationClient
 
 import static extension de.oehme.xtend.contrib.macro.CommonQueries.*
 
@@ -39,12 +41,11 @@ class CommonTransformations {
 			fields.forEach [ f |
 				addParameter(f.simpleName, f.type)
 			]
-			body = [
-				'''
-					«FOR f : fields»
-						this.«f.simpleName» = «f.simpleName»;
-					«ENDFOR»
-				''']
+			body = '''
+				«FOR f : fields»
+					this.«f.simpleName» = «f.simpleName»;
+				«ENDFOR»
+			'''
 		]
 	}
 
@@ -54,14 +55,13 @@ class CommonTransformations {
 	def addDataToString(MutableClassDeclaration cls) {
 		cls.addMethod("toString") [
 			returnType = string
-			body = [extension ctx|
-				'''
-					return «guavaObjects.toJavaCode».toStringHelper(«cls.simpleName».class)
-					«FOR a : cls.persistentState»
-						.add("«a.simpleName»",«a.simpleName»)
-					«ENDFOR»
-					.toString();
-				''']
+			body = '''
+				return «Objects».toStringHelper(«cls».class)
+				«FOR a : cls.persistentState»
+					.add("«a.simpleName»",«a.simpleName»)
+				«ENDFOR»
+				.toString();
+			'''
 		]
 	}
 
@@ -72,15 +72,16 @@ class CommonTransformations {
 		cls.addMethod("equals") [
 			returnType = primitiveBoolean
 			addParameter("o", object)
-			body = [extension ctx|
-				'''
-					if (o instanceof «cls.simpleName») {
-						«cls.simpleName» other = («cls.simpleName») o;
-						return «cls.persistentState.join("\n&& ")[
-						'''«guavaObjects.toJavaCode».equal(«simpleName», other.«simpleName»)''']»;
-					}
-					return false;
-				''']
+			body = '''
+				if (o instanceof «cls») {
+					«cls» other = («cls») o;
+					return «FOR field : cls.persistentState SEPARATOR " &&"»
+					«Objects».equal(«field.simpleName», other.«field.simpleName»)
+					«ENDFOR» 
+					;
+				}
+				return false;
+			'''
 		]
 	}
 
@@ -90,9 +91,7 @@ class CommonTransformations {
 	def addDataHashCode(MutableClassDeclaration cls) {
 		cls.addMethod("hashCode") [
 			returnType = primitiveInt
-			body = [extension ctx|
-				'''return «guavaObjects.toJavaCode».hashCode(«cls.persistentState.join(",")[
-					simpleName]»);''']
+			body = '''return «Objects».hashCode(«cls.persistentState.join(",")[simpleName]»);'''
 		]
 	}
 
@@ -103,7 +102,20 @@ class CommonTransformations {
 	 */
 	def addImplementationFor(MutableClassDeclaration cls, MethodDeclaration baseMethod,
 		CompilationStrategy implementation) {
-		val method = cls.addMethod(baseMethod.simpleName) [
+		val method = createImplementation(cls, baseMethod)
+		method.body = implementation
+		method
+	}
+
+	def addImplementationFor(MutableClassDeclaration cls, MethodDeclaration baseMethod,
+		StringConcatenationClient implementation) {
+		val method = createImplementation(cls, baseMethod)
+		method.body = implementation
+		method
+	}
+
+	def private createImplementation(MutableClassDeclaration cls, MethodDeclaration baseMethod) {
+		cls.addMethod(baseMethod.simpleName) [
 			visibility = baseMethod.visibility
 			returnType = baseMethod.returnType
 			exceptions = baseMethod.exceptions
@@ -111,9 +123,7 @@ class CommonTransformations {
 			baseMethod.parameters.forEach[p|addParameter(p.simpleName, p.type)]
 			varArgs = baseMethod.varArgs
 			docComment = baseMethod.docComment
-			body = implementation
 		]
-		method
 	}
 
 	/**
@@ -121,9 +131,20 @@ class CommonTransformations {
 	 * The original method then gets the newly specified body which can delegate to the inner method.
 	 * @return the inner method.
 	 */
-	def addIndirection(MutableMethodDeclaration wrapper, String innerMethodName,
-		CompilationStrategy indirection) {
-		val inner = wrapper.declaringType.addMethod(innerMethodName) [
+	def addIndirection(MutableMethodDeclaration wrapper, String innerMethodName, CompilationStrategy indirection) {
+		val inner = createInnerMethod(wrapper, innerMethodName)
+		wrapper.body = indirection
+		inner
+	}
+
+	def addIndirection(MutableMethodDeclaration wrapper, String innerMethodName, StringConcatenationClient indirection) {
+		val inner = createInnerMethod(wrapper, innerMethodName)
+		wrapper.body = indirection
+		inner
+	}
+
+	private def createInnerMethod(MutableMethodDeclaration wrapper, String innerMethodName) {
+		wrapper.declaringType.addMethod(innerMethodName) [
 			static = wrapper.static
 			returnType = wrapper.returnType
 			exceptions = wrapper.exceptions
@@ -133,26 +154,21 @@ class CommonTransformations {
 			visibility = Visibility.PRIVATE
 			body = wrapper.body
 		]
-		wrapper.body = indirection
-		inner
 	}
 
 	def addGetter(MutableFieldDeclaration field) {
 		field.declaringType.addMethod("get" + field.simpleName.toFirstUpper) [
 			returnType = field.type
-			body = [
-				'''
-					return «field.simpleName»;
-				''']
+			body = '''
+				return «field.simpleName»;
+			'''
 		]
 	}
 
 	def addSetter(MutableFieldDeclaration field) {
 		field.declaringType.addMethod("set" + field.simpleName.toFirstUpper) [
 			addParameter(field.simpleName, field.type)
-			body = [
-				'''this.«field.simpleName» = «field.simpleName»;'''
-			]
+			body = '''this.«field.simpleName» = «field.simpleName»;'''
 		]
 	}
 
@@ -162,9 +178,5 @@ class CommonTransformations {
 
 	def dispatch setStatic(MutableFieldDeclaration field, boolean isStatic) {
 		field.static = isStatic
-	}
-
-	private def guavaObjects() {
-		"com.google.common.base.Objects".newTypeReference
 	}
 }

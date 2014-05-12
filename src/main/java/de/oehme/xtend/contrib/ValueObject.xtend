@@ -1,19 +1,25 @@
 package de.oehme.xtend.contrib
 
+import de.oehme.xtend.contrib.macro.CommonTransformations
+import java.lang.annotation.ElementType
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
+import java.lang.annotation.Target
 import org.eclipse.xtend.lib.macro.AbstractClassProcessor
 import org.eclipse.xtend.lib.macro.Active
 import org.eclipse.xtend.lib.macro.RegisterGlobalsContext
 import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
-import org.eclipse.xtext.xbase.lib.Procedures
-import static extension de.oehme.xtend.contrib.macro.CommonQueries.*;
-import de.oehme.xtend.contrib.macro.CommonTransformations
+
+import static extension de.oehme.xtend.contrib.macro.CommonQueries.*
 
 /**
  * Turns your class into an immutable value object with a builder, getters for all fields
  * and default equals, hashcode and toString methods.
  */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 @Active(ValueObjectProcessor)
 annotation ValueObject {
 }
@@ -21,14 +27,14 @@ annotation ValueObject {
 class ValueObjectProcessor extends AbstractClassProcessor {
 
 	override doRegisterGlobals(ClassDeclaration cls, RegisterGlobalsContext context) {
-		if(!cls.compilationUnit.sourceTypeDeclarations.exists[qualifiedName == cls.builderClassName]) {
+		if (!cls.compilationUnit.sourceTypeDeclarations.exists[qualifiedName == cls.builderClassName]) {
 			context.registerClass(cls.builderClassName)
 		}
 	}
 
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
 		val extension transformations = new CommonTransformations(context)
-		if(cls.extendedClass != object)
+		if (cls.extendedClass != object)
 			cls.addError("Inheritance does not play well with immutability")
 
 		cls.final = true
@@ -36,20 +42,18 @@ class ValueObjectProcessor extends AbstractClassProcessor {
 			final = true
 			addMethod("build") [
 				returnType = cls.newTypeReference
-				body = [
-					'''
-						return new «cls.simpleName»(«cls.persistentState.join(",")[simpleName]»);
-					''']
+				body = '''
+					return new «cls.simpleName»(«cls.persistentState.join(",")[simpleName]»);
+				'''
 			]
 			cls.persistentState.forEach [ field |
 				addMethod(field.simpleName) [
 					addParameter(field.simpleName, field.type)
 					returnType = cls.builderClass(context).newTypeReference
-					body = [
-						'''
-							this.«field.simpleName» = «field.simpleName»;
-							return this;
-						''']
+					body = '''
+						this.«field.simpleName» = «field.simpleName»;
+						return this;
+					'''
 				]
 				addField(field.simpleName) [
 					type = field.type
@@ -61,20 +65,18 @@ class ValueObjectProcessor extends AbstractClassProcessor {
 			static = true
 			returnType = cls.newTypeReference
 			addParameter("init", Procedures.Procedure1.newTypeReference(builder.newTypeReference))
-			body = [
-				'''
-					«cls.builderClassName» builder = builder();
-					init.apply(builder);
-					return builder.build();
-				''']
+			body = '''
+				«cls.builderClassName» builder = builder();
+				init.apply(builder);
+				return builder.build();
+			'''
 		]
 		cls.addMethod("builder") [
 			returnType = cls.builderClass(context).newTypeReference
 			static = true
-			body = [
-				'''
-					return new «cls.builderClassName»();
-				''']
+			body = '''
+				return new «cls.builderClassName»();
+			'''
 		]
 
 		cls.persistentState.forEach [ field |

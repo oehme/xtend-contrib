@@ -1,17 +1,27 @@
 package de.oehme.xtend.contrib
 
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
+import com.google.common.cache.LoadingCache
+import com.google.common.util.concurrent.ExecutionError
+import com.google.common.util.concurrent.UncheckedExecutionException
+import de.oehme.xtend.contrib.macro.CommonTransformations
+import java.lang.annotation.ElementType
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
+import java.lang.annotation.Target
 import java.util.Arrays
 import java.util.List
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.TimeUnit
 import org.eclipse.xtend.lib.macro.Active
 import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.TransformationParticipant
-import org.eclipse.xtend.lib.macro.declaration.CompilationStrategy.CompilationContext
-import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
-import org.eclipse.xtend.lib.macro.declaration.TypeReference
-import org.eclipse.xtext.xbase.lib.Exceptions
-import de.oehme.xtend.contrib.macro.CommonTransformations
 import org.eclipse.xtend.lib.macro.declaration.MethodDeclaration
+import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.ParameterDeclaration
+import org.eclipse.xtend.lib.macro.declaration.TypeReference
+import org.eclipse.xtend2.lib.StringConcatenationClient
 
 /**
  * Caches invocations of a method. When the method is called multiple times with the same parameters, a cached result will be returned.
@@ -24,26 +34,31 @@ import org.eclipse.xtend.lib.macro.declaration.ParameterDeclaration
  * 	<li>The method is referentially transparent (has no externally visible side effects)</li>
  * </ul>
  */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 @Active(CachedProcessor)
 annotation Cached {
+	int maximumSize = 0
+	int expireAfterWrite = 0
+	int expireAfterAccess = 0
+	TimeUnit timeUnit = TimeUnit.NANOSECONDS
 }
 
 class CachedProcessor implements TransformationParticipant<MutableMethodDeclaration> {
 
 	/**
-	 * This allows you to get the name of the cache field that will be generated for a cached method. This way you can write your own active annotations that add additional features for cached methods.
+	 * This allows you to get the name of the cache field that will be generated for a cached method. 
+	 * This way you can write your own active annotations that add additional features for cached methods.
 	 */
 	static def String cacheFieldName(MethodDeclaration method) {
-		'''_cache_«method.simpleName»«IF !method.parameters.empty»_«method.parameters.join("_")[
-			fieldFriendlyName]»«ENDIF»'''
+		'''_cache_«method.simpleName»«IF !method.parameters.empty»_«method.parameters.join("_")[fieldFriendlyName]»«ENDIF»'''
 	}
 
 	private def static fieldFriendlyName(ParameterDeclaration it) {
 		type.type.qualifiedName.replaceAll("\\.", "_")
 	}
 
-	override doTransform(List<? extends MutableMethodDeclaration> methods,
-		extension TransformationContext context) {
+	override doTransform(List<? extends MutableMethodDeclaration> methods, extension TransformationContext context) {
 		methods.forEach [
 			switch (parameters.size) {
 				case 0: new ParamterlessMethodMemoizer(it, context).generate
@@ -69,16 +84,16 @@ abstract class MethodMemoizer {
 		method => [
 			if (returnType.inferred) {
 				addError("Please explicitly specify the return type")
-        return
+				return
 			}
 			returnType = returnType.wrapperIfPrimitive
-			addIndirection(initMethodName)[cacheCall]
+			addIndirection(initMethodName, cacheCall)
 			declaringType => [
 				addField(cacheFieldName) [
 					static = method.static
-          transient = true
+					transient = true
 					type = cacheFieldType
-					initializer = [cacheFieldInit]
+					initializer = cacheFieldInit
 				]
 			]
 		]
@@ -90,11 +105,11 @@ abstract class MethodMemoizer {
 		CachedProcessor.cacheFieldName(method)
 	}
 
-	def protected CharSequence cacheCall(CompilationContext context)
+	def protected StringConcatenationClient cacheCall()
 
 	def protected TypeReference cacheFieldType()
 
-	def protected CharSequence cacheFieldInit(CompilationContext context)
+	def protected StringConcatenationClient cacheFieldInit()
 }
 
 /**
@@ -106,7 +121,7 @@ class ParamterlessMethodMemoizer extends MethodMemoizer {
 		super(method, context)
 	}
 
-	override protected cacheCall(extension CompilationContext context) '''
+	override protected cacheCall() '''
 		if («cacheFieldName» == null) {
 			synchronized(«lock») {
 				if («cacheFieldName» == null) {
@@ -121,10 +136,10 @@ class ParamterlessMethodMemoizer extends MethodMemoizer {
 		method.returnType
 	}
 
-	override protected cacheFieldInit(CompilationContext context) '''null'''
+	override protected cacheFieldInit() '''null'''
 
 	def lock() {
-		if(method.static) '''«method.declaringType.simpleName».class''' else "this"
+		if (method.static) '''«method.declaringType.simpleName».class''' else "this"
 	}
 }
 
@@ -136,45 +151,69 @@ abstract class ParametrizedMethodMemoizer extends MethodMemoizer {
 		super(method, context)
 	}
 
-	override protected final cacheFieldInit(extension CompilationContext context) '''
-		com.google.common.cache.CacheBuilder.newBuilder()
-		.build(new com.google.common.cache.CacheLoader<«cacheKeyType.toJavaCode», «method.returnType.
-			toJavaCode»>() {
+	override protected final cacheFieldInit() '''
+		«CacheBuilder».newBuilder()
+		«IF maximumSize > 0»
+			.maximumSize(«maximumSize»)
+		«ENDIF»
+		«IF expireAfterWrite > 0»
+			.expireAfterWrite(«expireAfterWrite», «TimeUnit».«timeUnit»)
+		«ENDIF»
+		«IF expireAfterAccess > 0»
+			.expireAfterAccess(«expireAfterAccess», «TimeUnit».«timeUnit»)
+		«ENDIF»
+		.build(new «CacheLoader»<«cacheKeyType», «method.returnType»>() {
 			@Override
-			public «method.returnType.toJavaCode» load(«cacheKeyType.toJavaCode» key) throws Exception {
-				return «initMethodName»(«cacheKeyToParameters(context)»);
+			public «method.returnType» load(«cacheKeyType» key) throws Exception {
+				return «initMethodName»(«cacheKeyToParameters»);
 			}
 		})
 	'''
 
 	override protected final cacheFieldType() {
-		newTypeReference(
-			"com.google.common.cache.LoadingCache",
-			cacheKeyType,
-			method.returnType
-		)
+		newTypeReference(LoadingCache, cacheKeyType, method.returnType)
 	}
 
-	override protected final cacheCall(extension CompilationContext context) '''
+	override protected final cacheCall() '''
 		try {
-			return «cacheFieldName».get(«parametersToCacheKey(context)»);
+			return «cacheFieldName».get(«parametersToCacheKey()»);
 		} catch (Throwable e) {
-			if (e instanceof java.util.concurrent.ExecutionException
-				|| e instanceof com.google.common.util.concurrent.UncheckedExecutionException
-				|| e instanceof com.google.common.util.concurrent.ExecutionError) {
+			if (e instanceof «ExecutionException»
+				|| e instanceof «UncheckedExecutionException»
+				|| e instanceof «ExecutionError») {
 				Throwable cause = e.getCause();
-				throw «Exceptions.newTypeReference.toJavaCode».sneakyThrow(cause);
+				throw «Exceptions».sneakyThrow(cause);
 			} else {
-				throw «Exceptions.newTypeReference.toJavaCode».sneakyThrow(e);
+				throw «Exceptions».sneakyThrow(e);
 			}
 		}
 	'''
 
+	protected def final maximumSize() {
+		cacheAnnotation.getIntValue("maximumSize")
+	}
+
+	protected def final expireAfterWrite() {
+		cacheAnnotation.getIntValue("expireAfterWrite")
+	}
+
+	protected def final expireAfterAccess() {
+		cacheAnnotation.getIntValue("expireAfterAccess")
+	}
+
+	protected def final timeUnit() {
+		cacheAnnotation.getEnumValue("timeUnit").simpleName
+	}
+
+	protected def final cacheAnnotation() {
+		method.findAnnotation(findTypeGlobally(Cached))
+	}
+
 	def protected TypeReference cacheKeyType()
 
-	def protected CharSequence parametersToCacheKey(CompilationContext context)
+	def protected StringConcatenationClient parametersToCacheKey()
 
-	def protected CharSequence cacheKeyToParameters(CompilationContext context)
+	def protected StringConcatenationClient cacheKeyToParameters()
 }
 
 class SingleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
@@ -182,11 +221,9 @@ class SingleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
 		super(method, context)
 	}
 
-	override protected cacheKeyToParameters(CompilationContext context) '''key'''
+	override protected cacheKeyToParameters() '''key'''
 
-	override protected parametersToCacheKey(CompilationContext context) {
-		parameter.simpleName
-	}
+	override protected parametersToCacheKey() '''«parameter.simpleName»'''
 
 	override protected cacheKeyType() {
 		parameter.type.wrapperIfPrimitive
@@ -202,16 +239,9 @@ class MultipleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
 		super(method, context)
 	}
 
-	override protected cacheKeyToParameters(extension CompilationContext context) {
-		method.parameters.join(",")[
-			'''
-				(«type.wrapperIfPrimitive.toJavaCode») key.get(«method.parameters.toList.indexOf(it)»)
-			''']
-	}
+	override protected cacheKeyToParameters() '''«FOR p : method.parameters SEPARATOR ","»(«p.type.wrapperIfPrimitive») key.get(«method.parameters.toList.indexOf(p)»)«ENDFOR»'''
 
-	override protected parametersToCacheKey(extension CompilationContext context) '''
-		new «cacheKeyType.toJavaCode»(«method.parameters.join("", ",", "")[simpleName]»)
-	'''
+	override protected parametersToCacheKey() '''new «cacheKeyType»(«method.parameters.join(",")[simpleName]»)'''
 
 	override protected cacheKeyType() {
 		CacheKey.newTypeReference
@@ -234,7 +264,7 @@ class CacheKey {
 	}
 
 	override equals(Object obj) {
-		if(obj instanceof CacheKey) {
+		if (obj instanceof CacheKey) {
 			return Arrays.equals(parameters, obj.parameters)
 		}
 		false
