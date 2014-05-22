@@ -60,7 +60,7 @@
 	</organization>
 
 	<properties>
-		<xtend.version>2.6.0-SNAPSHOT</xtend.version>
+		<xtend.version>2.6.0</xtend.version>
 		<jnario.version>0.7.1</jnario.version>
 	</properties>
 
