@@ -34,18 +34,26 @@ class CommonQueries {
 		cls.hasExecutable(constructorSignature(cls, cls.persistentState.map[type]))
 	}
 
-	def static hasToString(MutableClassDeclaration cls) {
+	def static hasToString(ClassDeclaration cls) {
 		cls.hasExecutable("toString".signature)
 	}
 
-	def static hasEquals(MutableClassDeclaration cls) {
+	def static hasEquals(ClassDeclaration cls) {
 		cls.declaredMethods.exists[
 			simpleName == "equals" && parameters.size == 1 &&
 				parameters.head.type.name == "java.lang.Object"]
 	}
 
-	def static hasHashCode(MutableClassDeclaration cls) {
+	def static hasHashCode(ClassDeclaration cls) {
 		cls.hasExecutable("hashCode".signature)
+	}
+	
+	def static hasGetter(FieldDeclaration field) {
+		(field.declaringType as ClassDeclaration).hasExecutable(signature('''get«field.simpleName.toFirstUpper»'''))
+	}
+	
+	def static hasSetter(FieldDeclaration field) {
+		(field.declaringType as ClassDeclaration).hasExecutable(signature('''set«field.simpleName.toFirstUpper»''', field.type))
 	}
 
 	/**
