@@ -22,7 +22,7 @@ class PropertyProcessor extends AbstractFieldProcessor {
 			field.addGetter
 			field.markAsRead
 		}
-		if (!field.hasSetter) {
+		if (!field.final && !field.hasSetter) {
 			field.addSetter
 		}
 	}
