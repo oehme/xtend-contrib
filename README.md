@@ -61,6 +61,15 @@ Turns a class into an immutable value object, including a fluent builder class.
     	*/
     }
     
+@Property
+---------
+
+Adds a getter and (if not final) a setter to a field, if not already present. Contrary to the @Property annotation shipped with Xtend, this one will *not* rename the field. This means it follows the JavaBean conventions and will work with reflective frameworks.
+
+    class Person {
+      @Property String name
+    }
+    
 @ExtractInterface
 -----------------
 
