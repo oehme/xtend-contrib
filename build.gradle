@@ -1,13 +1,6 @@
-buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath 'org.xtend:xtend-gradle-plugin:0.1.+'
-  }
+plugins {
+	id 'org.xtend.xtend' version '0.2.0'
 }
-
-apply plugin: 'xtend'
 
 repositories {
 	mavenCentral()
@@ -16,8 +9,4 @@ repositories {
 dependencies {
   compile 'com.google.guava:guava:15.0'
   compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.6.+'
-}
-
-task createWrapper(type: Wrapper) {
-  gradleVersion = '1.12'
 }
