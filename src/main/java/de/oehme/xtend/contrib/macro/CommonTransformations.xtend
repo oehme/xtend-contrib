@@ -1,16 +1,15 @@
 package de.oehme.xtend.contrib.macro
 
-import com.google.common.base.Objects
+import com.google.common.collect.Maps
+import java.util.Map
 import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.CompilationStrategy
-import org.eclipse.xtend.lib.macro.declaration.MethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
-import org.eclipse.xtend.lib.macro.declaration.MutableFieldDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
+import org.eclipse.xtend.lib.macro.declaration.ResolvedMethod
+import org.eclipse.xtend.lib.macro.declaration.TypeReference
 import org.eclipse.xtend.lib.macro.declaration.Visibility
 import org.eclipse.xtend2.lib.StringConcatenationClient
-
-import static extension de.oehme.xtend.contrib.macro.CommonQueries.*
 
 /**
  * Commonly used AST transformations. These are only useful during the "doTransform" step 
@@ -33,96 +32,28 @@ class CommonTransformations {
 	}
 
 	/**
-	 * Adds a constructor that takes all non-transient fields of this class.
-	 */
-	def addDataConstructor(MutableClassDeclaration cls) {
-		cls.addConstructor [
-			val fields = persistentState(cls)
-			fields.forEach [ f |
-				addParameter(f.simpleName, f.type)
-			]
-			body = '''
-				«FOR f : fields»
-					this.«f.simpleName» = «f.simpleName»;
-				«ENDFOR»
-			'''
-		]
-	}
-
-	/**
-	 * Adds a toString method that prints all persistent fields of this class
-	 */
-	def addDataToString(MutableClassDeclaration cls) {
-		cls.addMethod("toString") [
-			returnType = string
-			body = '''
-				return «Objects».toStringHelper(«cls».class)
-				«FOR a : cls.persistentState»
-					.add("«a.simpleName»",«a.simpleName»)
-				«ENDFOR»
-				.toString();
-			'''
-		]
-	}
-
-	/**
-	 * Adds an equals method that compares all persistent fields of this class
-	 */
-	def addDataEquals(MutableClassDeclaration cls) {
-		cls.addMethod("equals") [
-			returnType = primitiveBoolean
-			addParameter("o", object)
-			body = '''
-				if (o instanceof «cls») {
-					«cls» other = («cls») o;
-					return «FOR field : cls.persistentState SEPARATOR " &&"»
-					«Objects».equal(«field.simpleName», other.«field.simpleName»)
-					«ENDFOR» 
-					;
-				}
-				return false;
-			'''
-		]
-	}
-
-	/**
-	 * Adds a hashCode method that takes all persistent fields of this class
-	 */
-	def addDataHashCode(MutableClassDeclaration cls) {
-		cls.addMethod("hashCode") [
-			returnType = primitiveInt
-			body = '''return «Objects».hashCode(«cls.persistentState.join(",")[simpleName]»);'''
-		]
-	}
-
-	/**
 	 * Copies the header of the given base method so that you only have to add a body in most cases.
 	 * You are free to modify the default settings, of course, e.g. widening the visibility of the
 	 * implementing method.
 	 */
-	def addImplementationFor(MutableClassDeclaration cls, MethodDeclaration baseMethod,
-		CompilationStrategy implementation) {
-		val method = createImplementation(cls, baseMethod)
-		method.body = implementation
-		method
+	def addImplementationFor(MutableClassDeclaration cls, ResolvedMethod baseMethod, CompilationStrategy implementation) {
+		createImplementation(cls, baseMethod) => [
+			body = implementation
+		]
 	}
 
-	def addImplementationFor(MutableClassDeclaration cls, MethodDeclaration baseMethod,
+	def addImplementationFor(MutableClassDeclaration cls, ResolvedMethod baseMethod,
 		StringConcatenationClient implementation) {
-		val method = createImplementation(cls, baseMethod)
-		method.body = implementation
-		method
+		createImplementation(cls, baseMethod) => [
+			body = implementation
+		]
 	}
 
-	def private createImplementation(MutableClassDeclaration cls, MethodDeclaration baseMethod) {
-		cls.addMethod(baseMethod.simpleName) [
-			visibility = baseMethod.visibility
-			returnType = baseMethod.returnType
-			exceptions = baseMethod.exceptions
-			baseMethod.typeParameters.forEach[p|addTypeParameter(p.simpleName, p.upperBounds)]
-			baseMethod.parameters.forEach[p|addParameter(p.simpleName, p.type)]
-			varArgs = baseMethod.varArgs
-			docComment = baseMethod.docComment
+	def private createImplementation(MutableClassDeclaration cls, ResolvedMethod baseMethod) {
+		cls.addMethod(baseMethod.declaration.simpleName) [
+			copySignatureFrom(baseMethod)
+			abstract = false
+			primarySourceElement  baseMethod.declaration
 		]
 	}
 
@@ -145,38 +76,53 @@ class CommonTransformations {
 
 	private def createInnerMethod(MutableMethodDeclaration wrapper, String innerMethodName) {
 		wrapper.declaringType.addMethod(innerMethodName) [
-			static = wrapper.static
-			returnType = wrapper.returnType
-			exceptions = wrapper.exceptions
-			wrapper.typeParameters.forEach[p|addTypeParameter(p.simpleName, p.upperBounds)]
-			wrapper.parameters.forEach[p|addParameter(p.simpleName, p.type)]
-			varArgs = wrapper.varArgs
+			val resolvedMethod = wrapper.declaringType.newSelfTypeReference.declaredResolvedMethods.findFirst[declaration == wrapper]
+			copySignatureFrom(resolvedMethod)
 			visibility = Visibility.PRIVATE
 			body = wrapper.body
+			primarySourceElement = wrapper
+		]
+	}
+	def copySignatureFrom(MutableMethodDeclaration it, ResolvedMethod source) {
+		copySignatureFrom(it, source, #{})
+	}
+
+	def copySignatureFrom(MutableMethodDeclaration it, ResolvedMethod source, Map<TypeReference, TypeReference> classTypeParameterMappings) {
+		abstract = source.declaration.abstract
+		deprecated = source.declaration.deprecated
+		^default = source.declaration.^default
+		docComment = source.declaration.docComment
+		final = source.declaration.final
+		native = source.declaration.native
+		static = source.declaration.static
+		strictFloatingPoint = source.declaration.strictFloatingPoint
+		synchronized = source.declaration.synchronized
+		varArgs = source.declaration.varArgs
+		visibility = source.declaration.visibility
+
+		val typeParameterMappings = Maps.newHashMap(classTypeParameterMappings)
+		source.resolvedTypeParameters.forEach [ param |
+			val copy = addTypeParameter(param.declaration.simpleName, param.resolvedUpperBounds.map[replace(typeParameterMappings)])
+			typeParameterMappings.put(param.declaration.newTypeReference, copy.newTypeReference)
+		]
+		exceptions = source.resolvedExceptionTypes.map[replace(typeParameterMappings)]
+		returnType = source.resolvedReturnType.replace(typeParameterMappings)
+		source.resolvedParameters.forEach [ p |
+			addParameter(p.declaration.simpleName, p.resolvedType.replace(typeParameterMappings))
 		]
 	}
 
-	def addGetter(MutableFieldDeclaration field) {
-		field.declaringType.addMethod("get" + field.simpleName.toFirstUpper) [
-			returnType = field.type
-			body = '''
-				return «field.simpleName»;
-			'''
-		]
+	private def TypeReference replace(TypeReference target,
+		Map<? extends TypeReference, ? extends TypeReference> mappings) {
+		mappings.entrySet.fold(target)[result, mapping|result.replace(mapping.key, mapping.value)]
 	}
 
-	def addSetter(MutableFieldDeclaration field) {
-		field.declaringType.addMethod("set" + field.simpleName.toFirstUpper) [
-			addParameter(field.simpleName, field.type)
-			body = '''this.«field.simpleName» = «field.simpleName»;'''
-		]
-	}
-
-	def dispatch setStatic(MutableMethodDeclaration method, boolean isStatic) {
-		method.static = isStatic
-	}
-
-	def dispatch setStatic(MutableFieldDeclaration field, boolean isStatic) {
-		field.static = isStatic
+	private def TypeReference replace(TypeReference target, TypeReference oldType, TypeReference newType) {
+		if (target.equals(oldType))
+			return newType
+		if (target.actualTypeArguments.contains(oldType)) {
+			return newTypeReference(target.type, target.actualTypeArguments.map[replace(oldType, newType)])
+		}
+		return target
 	}
 }

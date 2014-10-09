@@ -22,6 +22,7 @@ import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.ParameterDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeReference
 import org.eclipse.xtend2.lib.StringConcatenationClient
+import org.eclipse.xtend.lib.macro.declaration.TypeParameterDeclaration
 
 /**
  * Caches invocations of a method. When the method is called multiple times with the same parameters, a cached result will be returned.
@@ -90,6 +91,7 @@ abstract class MethodMemoizer {
 			addIndirection(initMethodName, cacheCall)
 			declaringType => [
 				addField(cacheFieldName) [
+					primarySourceElement = method
 					static = method.static
 					transient = true
 					type = cacheFieldType
@@ -104,12 +106,21 @@ abstract class MethodMemoizer {
 	def protected final String cacheFieldName() {
 		CachedProcessor.cacheFieldName(method)
 	}
+	
+	def protected final objectIfTypeParameter(TypeReference type) {
+		if (type.type instanceof TypeParameterDeclaration) {
+			object
+		} else {
+			type
+		}
+	}
 
 	def protected StringConcatenationClient cacheCall()
 
 	def protected TypeReference cacheFieldType()
 
 	def protected StringConcatenationClient cacheFieldInit()
+	
 }
 
 /**
@@ -122,18 +133,16 @@ class ParamterlessMethodMemoizer extends MethodMemoizer {
 	}
 
 	override protected cacheCall() '''
-		if («cacheFieldName» == null) {
-			synchronized(«lock») {
-				if («cacheFieldName» == null) {
-					«cacheFieldName» = «initMethodName»();
-				}
+		synchronized(«lock») {
+			if («cacheFieldName» == null) {
+				«cacheFieldName» = «initMethodName»();
 			}
+			return («method.returnType») «cacheFieldName»;
 		}
-		return «cacheFieldName»;
 	'''
 
 	override protected cacheFieldType() {
-		method.returnType
+		method.returnType.objectIfTypeParameter
 	}
 
 	override protected cacheFieldInit() '''null'''
@@ -162,21 +171,21 @@ abstract class ParametrizedMethodMemoizer extends MethodMemoizer {
 		«IF expireAfterAccess > 0»
 			.expireAfterAccess(«expireAfterAccess», «TimeUnit».«timeUnit»)
 		«ENDIF»
-		.build(new «CacheLoader»<«cacheKeyType», «method.returnType»>() {
+		.build(new «CacheLoader»<«cacheKeyType», «method.returnType.objectIfTypeParameter»>() {
 			@Override
-			public «method.returnType» load(«cacheKeyType» key) throws Exception {
+			public «method.returnType.objectIfTypeParameter» load(«cacheKeyType» key) throws Exception {
 				return «initMethodName»(«cacheKeyToParameters»);
 			}
 		})
 	'''
 
 	override protected final cacheFieldType() {
-		newTypeReference(LoadingCache, cacheKeyType, method.returnType)
+		newTypeReference(LoadingCache, cacheKeyType, method.returnType.objectIfTypeParameter)
 	}
 
 	override protected final cacheCall() '''
 		try {
-			return «cacheFieldName».get(«parametersToCacheKey()»);
+			return («method.returnType»)«cacheFieldName».get(«parametersToCacheKey()»);
 		} catch (Throwable e) {
 			if (e instanceof «ExecutionException»
 				|| e instanceof «UncheckedExecutionException»
@@ -226,7 +235,7 @@ class SingleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
 	override protected parametersToCacheKey() '''«parameter.simpleName»'''
 
 	override protected cacheKeyType() {
-		parameter.type.wrapperIfPrimitive
+		parameter.type.wrapperIfPrimitive.objectIfTypeParameter
 	}
 
 	def private parameter() {
@@ -239,7 +248,7 @@ class MultipleParameterMethodMemoizer extends ParametrizedMethodMemoizer {
 		super(method, context)
 	}
 
-	override protected cacheKeyToParameters() '''«FOR p : method.parameters SEPARATOR ","»(«p.type.wrapperIfPrimitive») key.get(«method.parameters.toList.indexOf(p)»)«ENDFOR»'''
+	override protected cacheKeyToParameters() '''«FOR p : method.parameters SEPARATOR ","»(«p.type.wrapperIfPrimitive.objectIfTypeParameter») key.get(«method.parameters.toList.indexOf(p)»)«ENDFOR»'''
 
 	override protected parametersToCacheKey() '''new «cacheKeyType»(«method.parameters.join(",")[simpleName]»)'''
 

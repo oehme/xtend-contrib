@@ -1,11 +1,11 @@
 package de.oehme.xtend.contrib.macro
 
 import com.google.common.collect.ImmutableList
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.ExecutableDeclaration
 import org.eclipse.xtend.lib.macro.declaration.FieldDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MethodDeclaration
-import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeReference
 
 /**
@@ -28,46 +28,6 @@ class CommonQueries {
 
 	def static hasExecutable(ClassDeclaration cls, Signature sig) {
 		cls.declaredMembers.filter(ExecutableDeclaration).exists[signature == sig]
-	}
-
-	def static hasDataConstructor(ClassDeclaration cls) {
-		cls.hasExecutable(constructorSignature(cls, cls.persistentState.map[type]))
-	}
-
-	def static hasToString(ClassDeclaration cls) {
-		cls.hasExecutable("toString".signature)
-	}
-
-	def static hasEquals(ClassDeclaration cls) {
-		cls.declaredMethods.exists[
-			simpleName == "equals" && parameters.size == 1 &&
-				parameters.head.type.name == "java.lang.Object"]
-	}
-
-	def static hasHashCode(ClassDeclaration cls) {
-		cls.hasExecutable("hashCode".signature)
-	}
-	
-	def static hasGetter(FieldDeclaration field) {
-		(field.declaringType as ClassDeclaration).hasExecutable(signature('''get«field.simpleName.toFirstUpper»'''))
-	}
-	
-	def static hasSetter(FieldDeclaration field) {
-		(field.declaringType as ClassDeclaration).hasExecutable(signature('''set«field.simpleName.toFirstUpper»''', field.type))
-	}
-
-	/**
-	 * All non-static, non-transient fields of this class
-	 */
-	def static persistentState(ClassDeclaration cls) {
-		cls.declaredFields.filter[!transient && !static]
-	}
-
-	/**
-	 * All non-static, non-transient fields of this class
-	 */
-	def static persistentState(MutableClassDeclaration cls) {
-		cls.declaredFields.filter[!transient && !static]
 	}
 
 	def static dispatch isStatic(FieldDeclaration field) {

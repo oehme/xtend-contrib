@@ -1,5 +1,6 @@
 package de.oehme.xtend.contrib
 
+import de.oehme.xtend.contrib.macro.CommonTransformations
 import java.lang.annotation.ElementType
 import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy
@@ -27,18 +28,23 @@ class ExtractInterfaceProcessor extends AbstractClassProcessor {
 	}
 
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
+		val extension CommonTransformations = new CommonTransformations(context)
 		findInterface(cls.qualifiedInterfaceName) => [ iface |
-			cls.implementedInterfaces = cls.implementedInterfaces + #[iface.newTypeReference]
-			cls.declaredMethods.filter[visibility == Visibility.PUBLIC static == false].forEach [ method |
-				iface.addMethod(method.simpleName) [ extracted |
-					extracted.visibility = Visibility.PUBLIC
-					//TODO https://bugs.eclipse.org/bugs/show_bug.cgi?id=412361
-					//method.typeParameters.forEach[extracted.addTypeParameter(simpleName, upperBounds)]
-					extracted.returnType = method.returnType
-					method.parameters.forEach[extracted.addParameter(simpleName, type)]
-					extracted.varArgs = method.varArgs
-					extracted.docComment = method.docComment
-					extracted.exceptions = method.exceptions
+			iface.primarySourceElement = cls
+			val typeParameterMappings = newHashMap
+			cls.typeParameters.forEach[p|
+				val copy = iface.addTypeParameter(p.simpleName, p.upperBounds)
+				typeParameterMappings.put(p.newTypeReference, copy.newTypeReference)
+			]
+			cls.implementedInterfaces = cls.implementedInterfaces + #[iface.newTypeReference(cls.typeParameters.map[newSelfTypeReference])]
+			cls.newSelfTypeReference.declaredResolvedMethods
+			.filter[declaration.visibility == Visibility.PUBLIC && declaration.static == false]
+			.forEach [ method |
+				iface.addMethod(method.declaration.simpleName) [
+					primarySourceElement = method.declaration
+					copySignatureFrom(method, typeParameterMappings)
+					visibility = Visibility.PUBLIC
+					abstract = true
 				]
 			]
 		]

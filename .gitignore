@@ -2,6 +2,7 @@
 .project
 .settings/
 .gradle/
+bin/
 build/
 target/
 xtend-gen/

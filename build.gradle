@@ -1,5 +1,5 @@
 plugins {
-	id 'org.xtend.xtend' version '0.2.0'
+	id 'org.xtend.xtend' version '0.2.2'
 }
 
 repositories {
@@ -8,5 +8,10 @@ repositories {
 
 dependencies {
   compile 'com.google.guava:guava:15.0'
-  compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.6.+'
+  compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.7.+'
+	testCompile 'junit:junit:4.11'
+	testCompile('org.eclipse.xtend:org.eclipse.xtend.core:2.7.+') {
+		exclude group: 'asm', module: 'asm'
+	}
+	testRuntime 'log4j:log4j:1.2.17'
 }
