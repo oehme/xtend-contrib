@@ -1,14 +1,14 @@
 plugins {
-	id 'org.xtend.xtend' version '0.2.2'
+	id 'org.xtend.xtend' version '0.3.0'
 }
 
 repositories {
-	mavenCentral()
+	jcenter()
 }
 
 dependencies {
-  compile 'com.google.guava:guava:15.0'
-  compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.7.+'
+	compile 'com.google.guava:guava:15.0'
+	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.7.+'
 	testCompile 'junit:junit:4.11'
 	testCompile('org.eclipse.xtend:org.eclipse.xtend.core:2.7.+') {
 		exclude group: 'asm', module: 'asm'
