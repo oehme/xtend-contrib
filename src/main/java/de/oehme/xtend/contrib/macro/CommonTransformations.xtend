@@ -120,9 +120,10 @@ class CommonTransformations {
 	private def TypeReference replace(TypeReference target, TypeReference oldType, TypeReference newType) {
 		if (target.equals(oldType))
 			return newType
-		if (target.actualTypeArguments.contains(oldType)) {
+		if (target.actualTypeArguments.contains(oldType))
 			return newTypeReference(target.type, target.actualTypeArguments.map[replace(oldType, newType)])
-		}
+		if(target.isArray)
+			return target.arrayComponentType.replace(oldType, newType).newArrayTypeReference
 		return target
 	}
 }
