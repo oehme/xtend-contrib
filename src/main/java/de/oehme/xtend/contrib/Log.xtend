@@ -8,14 +8,14 @@ import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 
 @Target(TYPE)
-@Active(LoggerProcessor)
-annotation WithLogger {
+@Active(LogProcessor)
+annotation Log {
 }
 
-class LoggerProcessor extends AbstractClassProcessor {
+class LogProcessor extends AbstractClassProcessor {
 
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
-		cls.addField("logger") [
+		cls.addField("log") [
 			static = true
 			final = true
 			type = Logger.newTypeReference

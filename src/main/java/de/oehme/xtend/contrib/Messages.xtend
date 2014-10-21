@@ -34,6 +34,7 @@ class MessagesProcessor extends AbstractClassProcessor {
 			final = true
 			primarySourceElement = cls
 		]
+		
 		cls.addConstructor [
 			addParameter("locale", Locale.newTypeReference)
 			body = '''
@@ -42,11 +43,16 @@ class MessagesProcessor extends AbstractClassProcessor {
 			bundleField.markAsInitializedBy(it)
 			primarySourceElement = cls
 		]
+		
 		val propertyFile = cls.compilationUnit.filePath.parent.append(cls.simpleName + ".properties")
+		if (!propertyFile.exists) {
+			cls.addError('''Property file «propertyFile» does not exist''')
+			return
+		}
 		val resourceBundle = new PropertyResourceBundle(propertyFile.contentsAsStream)
+		
 		Iterators.forEnumeration(resourceBundle.keys).forEach [ key |
 			val pattern = resourceBundle.getString(key)
-			val patternVariables = new MessageFormat(pattern).formats
 			cls.addMethod(key.keyToMethodName) [
 				returnType = string
 				body = '''
@@ -55,19 +61,21 @@ class MessagesProcessor extends AbstractClassProcessor {
 				docComment = pattern
 				primarySourceElement = cls
 			]
+			
+			val patternVariables = new MessageFormat(pattern).formats
 			if (!patternVariables.empty) {
 				cls.addMethod(key.keyToMethodName) [
 					patternVariables.forEach [ patternVariable, index |
 						addParameter("arg" + index, patternVariable.argumentType(context))
 					]
 					returnType = string
+					docComment = pattern
+					primarySourceElement = cls
 					body = '''
-						String pattern = bundle.getString("«key»");
+						«String» pattern = bundle.getString("«key»");
 						«MessageFormat» format = new «MessageFormat»(pattern);
 						return format.format(new «Object»[]{«parameters.join(", ")[simpleName]»});
 					'''
-					docComment = pattern
-					primarySourceElement = cls
 				]
 			}
 		]
@@ -84,5 +92,4 @@ class MessagesProcessor extends AbstractClassProcessor {
 			default: object
 		}
 	}
-
 }
