@@ -63,8 +63,8 @@ class MessagesProcessor extends AbstractClassProcessor {
 					returnType = string
 					body = '''
 						String pattern = bundle.getString("«key»");
-						«MessageFormat» format = new MessageFormat(pattern);
-						return format.format(new Object[]{«parameters.join(", ")[simpleName]»});
+						«MessageFormat» format = new «MessageFormat»(pattern);
+						return format.format(new «Object»[]{«parameters.join(", ")[simpleName]»});
 					'''
 					docComment = pattern
 					primarySourceElement = cls
