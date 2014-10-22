@@ -14,6 +14,8 @@ A collection of Active Annotations that will be useful in many projects, but whi
 Features
 ========
 
+You can see all the features in action in the [examples project](https://github.com/oehme/xtend-contrib/tree/master/xtend-contrib-examples/src/main/java/de/oehme/xtend/contrib/examples)
+
 @Cached
 -------
 Caches invocations of a method, e.g. to make recursive algorithms more efficient.
@@ -35,15 +37,17 @@ Creates a fluent Builder for ValueObjects. Works nicely with the @Data annotatio
 @Data
 @Buildable
 class Person {
-	String firstName
-	String lastName
-	int age
+    String firstName
+    String lastName
+    int age
 }
 ```
 
 @Messages
 ---------
 Creates a statically typed facade for localization ResourceBundles.
+The generated methods take an argument for each placeholder in the message.
+The type of the argument will be inferred from the message format.
 
 ```properties
 Hello=Hello {0}, the time currently is {1, time}!
@@ -52,11 +56,11 @@ Trains={0,number} trains spotted.
 
 ```xtend
 @Messages class MyMessages {
-	def static void main(String[] args) {
-		val messages = new MyMessages(Locale.GERMAN)
-		println(messages.hello("Stefan", new Date))
-		print(messages.trains(3))
-	}
+    def static void main(String[] args) {
+        val messages = new MyMessages(Locale.GERMAN)
+        println(messages.hello("Stefan", new Date))
+        print(messages.trains(3))
+    }
 }
 ```
 
@@ -65,10 +69,9 @@ Trains={0,number} trains spotted.
 Adds a java.util.logging.Logger to your class
 ```xtend
 @Log class Commander {
-	
-	def whatIsThis() {
-		log.warning("It's a trap!")
-	}
+    def whatIsThis() {
+        log.warning("It's a trap!")
+    }
 }
 ```
 
