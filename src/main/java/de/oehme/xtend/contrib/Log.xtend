@@ -22,7 +22,6 @@ class LogProcessor extends AbstractClassProcessor {
 			initializer = '''
 				«Logger».getLogger("«cls.qualifiedName»")
 			'''
-			addAnnotation(Extension.newAnnotationReference)
 			primarySourceElement = cls
 		]
 	}
