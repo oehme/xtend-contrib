@@ -1,0 +1,11 @@
+plugins {
+  id 'org.xtend.xtend' version '0.3.1'
+}
+
+repositories.jcenter()
+
+dependencies {
+	compile project(':xtend-contrib')
+}
+
+sourceCompatibility = 1.5
