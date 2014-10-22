@@ -33,58 +33,58 @@ All of these tasks are greatly simplified by the CommonQueries and CommonTransfo
 -------
 
 Caches invocations of a method, e.g. to make recursive algorithms more efficient.
-
-    @Cached
-    def BigInteger fibonacci(int n) {
-        switch n {
-            case 0: 0bi
-            case 1: 1bi
-            default: fibonacci(n - 1) + fibonacci(n - 2)
-        }
+```xtend
+@Cached
+def BigInteger fibonacci(int n) {
+    switch n {
+        case 0: 0bi
+        case 1: 1bi
+        default: fibonacci(n - 1) + fibonacci(n - 2)
     }
-
+}
+```
 @ValueObject
 ------------
 
 Turns a class into an immutable value object, including a fluent builder class.
+```xtend
+@ValueObject class Address {
+	String street
+	String city
+	String zip
+	String postOfficeBox
+}
 
-    @ValueObject class Address {
-    	String street
-    	String city
-    	String zip
-    	String postOfficeBox
-    }
-    
-    class AddressBuilder {
-    	/*You can customize the builder if you want, 
-    	* for instance add Annotations or convenience methods.
-    	*/
-    }
-    
+class AddressBuilder {
+	/*You can customize the builder if you want, 
+	* for instance add Annotations or convenience methods.
+	*/
+}
+```    
 @Property
 ---------
 
 Adds a getter and (if not final) a setter to a field, if not already present. Contrary to the @Property annotation shipped with Xtend, this one will *not* rename the field. This means it follows the JavaBean conventions and will work with reflective frameworks.
-
-    class Person {
-      @Property String name
-    }
-    
+```xtend
+class Person {
+  @Property String name
+}
+```  
 @ExtractInterface
 -----------------
 
 There are times where you have only one sensible production implementation of a class, but you want to use an interface for better testing. In such cases you just need to add the @ExtractInterface annotation to your class and Xtend will automatically create an interface with all the public methods of the class.
+```xtend
+@ExtractInterface
+//generates an interface called "Thing"
+class DefaultThing {
+    override foo() {
 
-    @ExtractInterface
-    //generates an interface called "Thing"
-    class DefaultThing {
-        override foo() {
-    
-        }
-    
-        override bar(String baz) {
-            "foobar"
-        }
     }
 
+    override bar(String baz) {
+        "foobar"
+    }
+}
+```
 ![](http://www.cloudbees.com/sites/default/files/Button-Built-on-CB-1.png)
