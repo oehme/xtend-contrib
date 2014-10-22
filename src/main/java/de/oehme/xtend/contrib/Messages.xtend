@@ -19,6 +19,7 @@ import org.eclipse.xtend.lib.macro.Active
 import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtend.lib.macro.services.TypeReferenceProvider
+import org.eclipse.xtend.lib.macro.declaration.Visibility
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -44,6 +45,16 @@ class MessagesProcessor extends AbstractClassProcessor {
 			primarySourceElement = cls
 		]
 		
+		cls.addMethod("getMessage") [
+			addParameter("key", string)
+			returnType = string
+			body = '''
+				return bundle.getString(key);
+			'''
+			docComment = "Returns the raw message String for further processing"
+			primarySourceElement = cls
+		]
+		
 		val propertyFile = cls.compilationUnit.filePath.parent.append(cls.simpleName + ".properties")
 		if (!propertyFile.exists) {
 			cls.addError('''Property file «propertyFile» does not exist''')
@@ -53,31 +64,29 @@ class MessagesProcessor extends AbstractClassProcessor {
 		
 		Iterators.forEnumeration(resourceBundle.keys).forEach [ key |
 			val pattern = resourceBundle.getString(key)
-			cls.addMethod(key.keyToMethodName) [
-				returnType = string
-				body = '''
-					return bundle.getString("«key»");
-				'''
+			cls.addField(key.toUpperCase)[
+				type = string
+				visibility = Visibility.PUBLIC
+				final = true
+				static = true
 				docComment = pattern
 				primarySourceElement = cls
+				initializer = '''"«key»"'''
 			]
-			
 			val patternVariables = new MessageFormat(pattern).formats
-			if (!patternVariables.empty) {
-				cls.addMethod(key.keyToMethodName) [
-					patternVariables.forEach [ patternVariable, index |
-						addParameter("arg" + index, patternVariable.argumentType(context))
-					]
-					returnType = string
-					docComment = pattern
-					primarySourceElement = cls
-					body = '''
-						«String» pattern = bundle.getString("«key»");
-						«MessageFormat» format = new «MessageFormat»(pattern);
-						return format.format(new «Object»[]{«parameters.join(", ")[simpleName]»});
-					'''
+			cls.addMethod(key.keyToMethodName) [
+				patternVariables.forEach [ patternVariable, index |
+					addParameter("arg" + index, patternVariable.argumentType(context))
 				]
-			}
+				returnType = string
+				docComment = pattern
+				primarySourceElement = cls
+				body = '''
+					«String» pattern = bundle.getString("«key»");
+					«MessageFormat» format = new «MessageFormat»(pattern);
+					return format.format(new «Object»[]{«parameters.join(", ")[simpleName]»});
+				'''
+			]
 		]
 	}
 
