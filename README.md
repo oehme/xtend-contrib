@@ -4,13 +4,13 @@ xtend-contrib
 Since the xtend-core library is kept very small (for good reason), there are some extension methods and active annotations that you may be missing in everyday development. This project provides some of the most commonly requested features.
 
 [![Build Status](https://oehme.ci.cloudbees.com/job/xtend-contrib/badge/icon)](https://oehme.ci.cloudbees.com/job/xtend-contrib/)
-
-    <dependency>
-      <groupId>com.github.oehme.xtend</groupId>
-      <artifactId>xtend-contrib</artifactId>
-      <version>...</version>
-    </dependency>
-
+```xml
+<dependency>
+  <groupId>com.github.oehme.xtend</groupId>
+  <artifactId>xtend-contrib</artifactId>
+  <version>...</version>
+</dependency>
+```
 Features
 ========
 
