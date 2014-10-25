@@ -74,6 +74,7 @@ Adds a java.util.logging.Logger to your class
     }
 }
 ```
+*If you find this annotation useful, but want to have it for another framework like log4j, please tell me in the issue section.*
 
 @ExtractInterface
 -----------------
@@ -93,6 +94,8 @@ class DefaultThing {
     }
 }
 ```
+
+*This annotation is a candidate for future removal. It was added at the request of a colleague, but I have never seen a real world use case for it. Please speak up in the issue section if you want me to keep it and tell me why =)*
 
 Convenience methods for copying signatures
 --------------------------------------------------
