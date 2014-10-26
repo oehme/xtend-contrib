@@ -97,8 +97,9 @@ class SignatureHelper {
 
 		val typeParameterMappings = Maps.newHashMap(classTypeParameterMappings)
 		source.resolvedTypeParameters.forEach [ param |
-			val copy = addTypeParameter(param.declaration.simpleName, param.resolvedUpperBounds.map[replace(typeParameterMappings)])
+			val copy = addTypeParameter(param.declaration.simpleName, param.resolvedUpperBounds)
 			typeParameterMappings.put(param.declaration.newTypeReference, copy.newTypeReference)
+			copy.upperBounds = copy.upperBounds.map[replace(typeParameterMappings)]
 		]
 		exceptions = source.resolvedExceptionTypes.map[replace(typeParameterMappings)]
 		returnType = source.resolvedReturnType.replace(typeParameterMappings)
@@ -113,10 +114,16 @@ class SignatureHelper {
 	}
 
 	private def TypeReference replace(TypeReference target, TypeReference oldType, TypeReference newType) {
-		if (target.equals(oldType))
+		if (target == oldType)
 			return newType
-		if (target.actualTypeArguments.contains(oldType))
+		if (!target.actualTypeArguments.isEmpty)
 			return newTypeReference(target.type, target.actualTypeArguments.map[replace(oldType, newType)])
+		if (target.wildCard) {
+			if (target.upperBound != object)
+				return target.upperBound.replace(oldType, newType).newWildcardTypeReference
+			else if (!target.lowerBound.isAnyType)
+				return target.lowerBound.replace(oldType, newType).newWildcardTypeReferenceWithLowerBound
+		}
 		if(target.isArray)
 			return target.arrayComponentType.replace(oldType, newType).newArrayTypeReference
 		return target
