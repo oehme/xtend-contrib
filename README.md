@@ -99,8 +99,8 @@ class DefaultThing {
 
 Convenience classes for writing Active Annotations
 --------------------------------------------------
-[SignatureHelper](https://github.com/oehme/xtend-contrib/blob/master/xtend-contrib/src/main/java/de/oehme/xtend/contrib/SignatureHelper.xtend) simplifies copying methods, e.g. to implement an interface or to add an indirection.
-[Reflections](https://github.com/oehme/xtend-contrib/blob/master/xtend-contrib/src/main/java/de/oehme/xtend/contrib/Reflections.xtend) allows you to scan packages for types in order to aggregate them
+- [SignatureHelper](https://github.com/oehme/xtend-contrib/blob/master/xtend-contrib/src/main/java/de/oehme/xtend/contrib/SignatureHelper.xtend) simplifies copying methods, e.g. to implement an interface or to add an indirection.
+- [Reflections](https://github.com/oehme/xtend-contrib/blob/master/xtend-contrib/src/main/java/de/oehme/xtend/contrib/Reflections.xtend) allows you to scan packages for types in order to aggregate them
 
 
 
