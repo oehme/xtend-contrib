@@ -97,9 +97,11 @@ class DefaultThing {
 
 *This annotation is a candidate for future removal. It was added at the request of a colleague, but I have never seen a real world use case for it. Please speak up in the issue section if you want me to keep it and tell me why =)*
 
-Convenience methods for copying signatures
+Convenience classes for writing Active Annotations
 --------------------------------------------------
-When writing advanced Active Annotations, one recurring task is copying methods, e.g. to implement an interface or to add an indirection.
-The SignatureHelper greatly simplifies this.
+[SignatureHelper](https://github.com/oehme/xtend-contrib/blob/master/xtend-contrib/src/main/java/de/oehme/xtend/contrib/SignatureHelper.xtend) simplifies copying methods, e.g. to implement an interface or to add an indirection.
+[Reflections](https://github.com/oehme/xtend-contrib/blob/master/xtend-contrib/src/main/java/de/oehme/xtend/contrib/Reflections.xtend) allows you to scan packages for types in order to aggregate them
+
+
 
 ![](http://www.cloudbees.com/sites/default/files/Button-Built-on-CB-1.png)
