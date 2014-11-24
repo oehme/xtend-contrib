@@ -8,13 +8,13 @@ buildscript {
 }
 
 plugins {
-  id 'org.xtend.xtend' version '0.3.1'
+  id 'org.xtend.xtend' version '0.3.2'
 }
 apply plugin: 'de.oehme.sobula.maven-release'
 apply plugin: 'de.oehme.sobula.bintray-release'
 
 group = 'com.github.oehme.xtend'
-version = '0.5.1'
+version = '0.5.2'
 description = 'Automates well known Java Patterns using Xtend Active Annotations'
 
 repositories.jcenter()
