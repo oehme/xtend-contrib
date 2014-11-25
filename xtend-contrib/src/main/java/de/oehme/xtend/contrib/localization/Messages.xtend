@@ -1,10 +1,9 @@
 package de.oehme.xtend.contrib.localization
 
+import com.google.common.annotations.Beta
 import com.google.common.base.CaseFormat
 import com.google.common.collect.Iterators
 import java.lang.annotation.ElementType
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
 import java.lang.annotation.Target
 import java.text.DateFormat
 import java.text.Format
@@ -18,9 +17,8 @@ import org.eclipse.xtend.lib.macro.AbstractClassProcessor
 import org.eclipse.xtend.lib.macro.Active
 import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
-import org.eclipse.xtend.lib.macro.services.TypeReferenceProvider
 import org.eclipse.xtend.lib.macro.declaration.Visibility
-import com.google.common.annotations.Beta
+import org.eclipse.xtend.lib.macro.services.TypeReferenceProvider
 
 /**
  * Generates a statically typed facade in front of Java ResourceBundles. 
@@ -36,7 +34,6 @@ import com.google.common.annotations.Beta
  */
 @Beta
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
 @Active(MessagesProcessor)
 annotation Messages {
 }

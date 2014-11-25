@@ -1,13 +1,12 @@
 package de.oehme.xtend.contrib
 
+import com.google.common.annotations.Beta
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import com.google.common.util.concurrent.ExecutionError
 import com.google.common.util.concurrent.UncheckedExecutionException
 import java.lang.annotation.ElementType
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
 import java.lang.annotation.Target
 import java.util.Arrays
 import java.util.List
@@ -22,7 +21,6 @@ import org.eclipse.xtend.lib.macro.declaration.ParameterDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeParameterDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeReference
 import org.eclipse.xtend2.lib.StringConcatenationClient
-import com.google.common.annotations.Beta
 
 /**
  * Caches invocations of a method. When the method is called multiple times with the same parameters, a cached result will be returned.
@@ -37,7 +35,6 @@ import com.google.common.annotations.Beta
  */
 @Beta
 @Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
 @Active(CachedProcessor)
 annotation Cached {
 	int maximumSize = 0
