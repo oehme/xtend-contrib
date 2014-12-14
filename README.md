@@ -3,14 +3,8 @@ xtend-contrib
 
 A collection of Active Annotations that will be useful in many projects, but which would be too controversial to include in the Xtend standard library.
 
-[![Build Status](https://oehme.ci.cloudbees.com/job/xtend-contrib/badge/icon)](https://oehme.ci.cloudbees.com/job/xtend-contrib/)
-```xml
-<dependency>
-  <groupId>com.github.oehme.xtend</groupId>
-  <artifactId>xtend-contrib</artifactId>
-  <version>[0.5,0.6)</version>
-</dependency>
-```
+[![Build Status](https://travis-ci.org/oehme/xtend-contrib.svg)](https://travis-ci.org/oehme/xtend-contrib)
+[ ![Download](https://api.bintray.com/packages/oehme/maven/xtend-contrib/images/download.svg) ](https://bintray.com/oehme/maven/xtend-contrib/_latestVersion)
 Features
 ========
 
@@ -101,7 +95,3 @@ Convenience classes for writing Active Annotations
 --------------------------------------------------
 - [SignatureHelper](https://github.com/oehme/xtend-contrib/blob/master/xtend-contrib/src/main/java/de/oehme/xtend/contrib/SignatureHelper.xtend) simplifies copying methods, e.g. to implement an interface or to add an indirection.
 - [Reflections](https://github.com/oehme/xtend-contrib/blob/master/xtend-contrib/src/main/java/de/oehme/xtend/contrib/Reflections.xtend) allows you to scan packages for types in order to aggregate them
-
-
-
-![](http://www.cloudbees.com/sites/default/files/Button-Built-on-CB-1.png)
