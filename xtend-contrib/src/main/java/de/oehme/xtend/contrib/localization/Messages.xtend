@@ -28,7 +28,7 @@ import org.eclipse.xtend.lib.macro.services.TypeReferenceProvider
  * <ul>
  * <li>- a static constant that contains the name of that key</li>
  * <li>- a method that takes as many parameters as the corresponding message has and returns the formatted, localized String</li>
- * <ul>
+ * </ul>
  * The generated class will have a constructor that takes a Locale and then returns messages in that language using the default
  * ResourceBundle lookup mechanism. 
  */

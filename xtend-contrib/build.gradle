@@ -1,27 +1,17 @@
-buildscript {
-	repositories {
-		maven { url 'http://dl.bintray.com/oehme/maven/' }
-	}
-	dependencies {
-		classpath 'de.oehme.sobula:sobula:0.0.+'
-	}
-}
-
 plugins {
-  id 'org.xtend.xtend' version '0.3.2'
+  id 'org.xtend.xtend' version '0.3.5'
+	id 'com.github.oehme.sobula.bintray-release' version '0.4.1'
+	id 'com.github.oehme.sobula.stefan' version '0.4.1'
 }
-apply plugin: 'de.oehme.sobula.maven-release'
-apply plugin: 'de.oehme.sobula.bintray-release'
 
 group = 'com.github.oehme.xtend'
-version = '0.5.2'
 description = 'Automates well known Java Patterns using Xtend Active Annotations'
 
 repositories.jcenter()
 
 dependencies {
 	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.7.+'
-	testCompile 'junit:junit:4.11'
+	testCompile 'junit:junit:4.12'
 	testCompile('org.eclipse.xtend:org.eclipse.xtend.core:2.7.+') {
 		exclude group: 'asm', module: 'asm'
 	}
