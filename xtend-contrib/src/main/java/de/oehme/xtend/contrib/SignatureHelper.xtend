@@ -104,7 +104,8 @@ class SignatureHelper {
 		exceptions = source.resolvedExceptionTypes.map[replace(typeParameterMappings)]
 		returnType = source.resolvedReturnType.replace(typeParameterMappings)
 		source.resolvedParameters.forEach [ p |
-			addParameter(p.declaration.simpleName, p.resolvedType.replace(typeParameterMappings))
+			val addedParam = addParameter(p.declaration.simpleName, p.resolvedType.replace(typeParameterMappings))
+			p.declaration.annotations.forEach[addedParam.addAnnotation(it)]
 		]
 	}
 

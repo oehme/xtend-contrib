@@ -175,4 +175,17 @@ class CachedTest {
 		}
 		'''.parse.assertNoErrors
 	}
+	
+	@Test
+	def testExtensionParameter() {
+		'''
+			import de.oehme.xtend.contrib.Cached
+			class CachedTest {
+				@Cached
+				def String foo(extension String bar) {
+					substring(3)
+				}
+			}
+		'''.parse.assertNoErrors
+	}
 }
