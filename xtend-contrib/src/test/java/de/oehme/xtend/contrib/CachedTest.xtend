@@ -188,4 +188,19 @@ class CachedTest {
 			}
 		'''.parse.assertNoErrors
 	}
+	
+	@Test
+	def testNameHygiene() {
+		'''
+			import de.oehme.xtend.contrib.Cached
+			class CachedTest {
+				@Cached
+				def String foo(String e) {
+					"Foo"
+				}
+			}
+		'''.compile[
+			assertNotNull(compiledClass)
+		]
+	}
 }

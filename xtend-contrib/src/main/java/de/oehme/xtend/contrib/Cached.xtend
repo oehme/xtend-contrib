@@ -181,20 +181,26 @@ abstract class ParametrizedMethodMemoizer extends MethodMemoizer {
 		newTypeReference(LoadingCache, cacheKeyType, method.returnType.objectIfTypeParameter)
 	}
 
-	override protected final cacheCall() '''
+	override protected final cacheCall()  {
+		val parameterNames = method.parameters.map[simpleName].toSet
+		val exceptionName = (1..1000).map["e" + it]
+			.findFirst[!parameterNames.contains(it)] 
+			?: "/* Unable to find an exception name after 1000 tries*/"
+		'''
 		try {
 			return («method.returnType»)«cacheFieldName».get(«parametersToCacheKey()»);
-		} catch (Throwable e) {
-			if (e instanceof «ExecutionException»
-				|| e instanceof «UncheckedExecutionException»
-				|| e instanceof «ExecutionError») {
-				Throwable cause = e.getCause();
+		} catch (Throwable «exceptionName») {
+			if («exceptionName» instanceof «ExecutionException»
+				|| «exceptionName» instanceof «UncheckedExecutionException»
+				|| «exceptionName» instanceof «ExecutionError») {
+				Throwable cause = «exceptionName».getCause();
 				throw «Exceptions».sneakyThrow(cause);
 			} else {
-				throw «Exceptions».sneakyThrow(e);
+				throw «Exceptions».sneakyThrow(«exceptionName»);
 			}
 		}
 	'''
+	}
 
 	protected def final maximumSize() {
 		cacheAnnotation.getIntValue("maximumSize")
