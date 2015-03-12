@@ -1,11 +1,11 @@
 plugins {
+	id 'org.xtend.xtend' version '0.4.5'
 	id 'com.github.oehme.sobula.bintray-release' version '0.4.1'
 	id 'com.github.oehme.sobula.stefan' version '0.4.1'
-	id 'org.xtend.xtend' version '0.4.5'
 }
+
 group = 'com.github.oehme.xtend'
 description = 'Automates well known Java Patterns using Xtend Active Annotations'
-
 repositories.jcenter()
 
 dependencies {
