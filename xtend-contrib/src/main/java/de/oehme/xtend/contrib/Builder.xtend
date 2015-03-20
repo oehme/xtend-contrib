@@ -1,22 +1,22 @@
 package de.oehme.xtend.contrib
 
+import com.google.common.annotations.Beta
 import java.lang.annotation.Target
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend.lib.macro.AbstractClassProcessor
 import org.eclipse.xtend.lib.macro.Active
 import org.eclipse.xtend.lib.macro.RegisterGlobalsContext
 import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
-import org.eclipse.xtend.lib.annotations.Data
-import com.google.common.annotations.Beta
 import org.eclipse.xtend.lib.macro.declaration.Visibility
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure0
 
 /**
- * Adds an inner Builder class to this class. The builder will have a fluent setter for each final field. The class
- * will both have a builder()-method for Java clients and a build[]-method for Xtend clients. 
+ * Adds an inner Builder class to this class. The builder will have a fluent setter for each final field and can be
+ * initialized from an existing value. The class will both have builder/copier()-method for Java clients and
+ * build/copy[]-method for Xtend clients.
  * This annotation assumes that there is a constructor which takes all the fields in the same order they are defined in the class.
- * Integrates well with the {@link Data} annotation. 
+ * Integrates well with the {@link Data} annotation.
  */
 @Beta
 @Target(TYPE)
@@ -27,7 +27,7 @@ annotation Buildable {
 class BuilderProcessor extends AbstractClassProcessor {
 
 	override doRegisterGlobals(ClassDeclaration it, extension RegisterGlobalsContext context) {
-		if (context.findSourceClass(builderClassName) == null) {
+		if (context.findSourceClass(builderClassName) === null) {
 			context.registerClass(builderClassName)
 		}
 	}
@@ -38,6 +38,16 @@ class BuilderProcessor extends AbstractClassProcessor {
 			primarySourceElement = cls
 			addConstructor[
 				visibility = Visibility.PRIVATE
+				addParameter("other", cls.newSelfTypeReference)
+				body = '''
+					«FOR builtField : cls.builtFields(context)»
+						this.«builtField.simpleName» = other.«builtField.simpleName»;
+					«ENDFOR»
+				'''
+				primarySourceElement = cls
+			]
+			addConstructor[
+				visibility = Visibility.PRIVATE
 				primarySourceElement = cls
 			]
 			cls.builtFields(context).forEach [ builtField |
@@ -46,6 +56,15 @@ class BuilderProcessor extends AbstractClassProcessor {
 					primarySourceElement = cls
 				]
 				addMethod(builtField.simpleName) [
+					returnType = builder.newTypeReference
+					addParameter(builtField.simpleName, builtField.type)
+					body = '''
+						this.«builtField.simpleName» = «builtField.simpleName»;
+						return this;
+					'''
+					primarySourceElement = cls
+				]
+				addMethod('''set«builtField.simpleName.toFirstUpper»''') [
 					returnType = builder.newTypeReference
 					addParameter(builtField.simpleName, builtField.type)
 					body = '''
@@ -71,13 +90,30 @@ class BuilderProcessor extends AbstractClassProcessor {
 			'''
 			primarySourceElement = cls
 		]
+		cls.addMethod("copy") [
+			returnType = builder.newTypeReference
+			body = '''
+				return new «builder»(this);
+			'''
+			primarySourceElement = cls
+		]
 		cls.addMethod("build") [
 			returnType = cls.newTypeReference
 			static = true
 			addParameter("init", Procedures.Procedure1.newTypeReference(builder.newSelfTypeReference))
 			body = '''
-				«builder» builder = new «builder»();
+				final «builder» builder = new «builder»();
 				init.apply(builder);
+				return builder.build();
+			'''
+			primarySourceElement = cls
+		]
+		cls.addMethod("copy") [
+			returnType = cls.newTypeReference
+			addParameter("copier", Procedures.Procedure1.newTypeReference(builder.newSelfTypeReference))
+			body = '''
+				final «builder» builder = new «builder»(this);
+				copier.apply(builder);
 				return builder.build();
 			'''
 			primarySourceElement = cls
@@ -89,14 +125,12 @@ class BuilderProcessor extends AbstractClassProcessor {
 	}
 
 	def builtFields(MutableClassDeclaration cls, extension TransformationContext context) {
-		cls.declaredFields.filter[
-			(final || cls.alsoCollectNonFinalFields(context)) && 
-			!static && 
-			!transient && 
-			isThePrimaryGeneratedJavaElement
+		cls.declaredFields.filter [
+			(final || cls.alsoCollectNonFinalFields(context)) && !static && !transient &&
+				isThePrimaryGeneratedJavaElement
 		]
 	}
-	
+
 	def boolean alsoCollectNonFinalFields(ClassDeclaration cls, extension TransformationContext context) {
 		cls.findAnnotation(Data.findTypeGlobally) !== null
 	}
