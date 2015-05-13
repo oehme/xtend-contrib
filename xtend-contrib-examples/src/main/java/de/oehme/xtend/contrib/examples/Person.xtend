@@ -13,13 +13,13 @@ class Person {
 
 class Main {
 	def static void main(String[] args) {
-		create()
-		copy()
+		create
+		copy
 	}
 
 	def static void create() {
 		// Java style
-		val me = Person.builder.firstName("Stefan").lastName("Oehme").age(27).build
+		val me = Person.builder.firstName("Stefan").lastName("Oehme").age(28).build
 		println(me)
 		// Xtend style
 		val john = Person.build [
@@ -31,7 +31,7 @@ class Main {
 	}
 
 	def static void copy() {
-		val me = Person.builder.firstName("Stefan").lastName("Oehme").age(27).build
+		val me = Person.builder.firstName("Stefan").lastName("Oehme").age(28).build
 		// Java style
 		val older_me = me.copy.age(28).build
 		println(older_me)
