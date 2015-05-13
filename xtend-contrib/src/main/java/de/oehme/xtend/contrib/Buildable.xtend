@@ -53,7 +53,7 @@ class BuilderProcessor extends AbstractClassProcessor {
 			cls.builtFields(context).forEach [ builtField |
 				addField(builtField.simpleName) [
 					type = builtField.type
-					primarySourceElement = cls
+					primarySourceElement = builtField
 				]
 				addMethod(builtField.simpleName) [
 					returnType = builder.newTypeReference
@@ -62,7 +62,7 @@ class BuilderProcessor extends AbstractClassProcessor {
 						this.«builtField.simpleName» = «builtField.simpleName»;
 						return this;
 					'''
-					primarySourceElement = cls
+					primarySourceElement = builtField
 				]
 				addMethod('''set«builtField.simpleName.toFirstUpper»''') [
 					returnType = builder.newTypeReference
@@ -71,7 +71,7 @@ class BuilderProcessor extends AbstractClassProcessor {
 						this.«builtField.simpleName» = «builtField.simpleName»;
 						return this;
 					'''
-					primarySourceElement = cls
+					primarySourceElement = builtField
 				]
 			]
 			addMethod("build") [
@@ -125,9 +125,9 @@ class BuilderProcessor extends AbstractClassProcessor {
 	}
 
 	def builtFields(MutableClassDeclaration cls, extension TransformationContext context) {
-		cls.declaredFields.filter [
-			(final || cls.alsoCollectNonFinalFields(context)) && !static && !transient &&
-				isThePrimaryGeneratedJavaElement
+		val sourceClass = cls.primarySourceElement as ClassDeclaration
+		sourceClass.declaredFields.filter [
+			(final || cls.alsoCollectNonFinalFields(context)) && !static && !transient
 		]
 	}
 
