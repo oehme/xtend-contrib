@@ -1,7 +1,6 @@
 language: java
 sudo: false
 cache:
-  branch: md5deep
   directories:
   - $HOME/.gradle
 install: true
