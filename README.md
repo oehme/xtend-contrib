@@ -70,27 +70,6 @@ Adds a java.util.logging.Logger to your class
 ```
 *If you find this annotation useful, but want to have it for another framework like log4j, please tell me in the issue section.*
 
-@ExtractInterface
------------------
-
-There are times where you only have one production implementation of a class, but others for testing purposes. 
-In such cases you just need to add the @ExtractInterface annotation to your class and Xtend will automatically create an interface with all the public methods of the class.
-```xtend
-@ExtractInterface
-//generates an interface called "Thing"
-class DefaultThing {
-    override foo() {
-
-    }
-
-    override bar(String baz) {
-        "foobar"
-    }
-}
-```
-
-*This annotation is a candidate for future removal. It was added at the request of a colleague, but I have never seen a real world use case for it. Please speak up in the issue section if you want me to keep it and tell me why =)*
-
 Convenience classes for writing Active Annotations
 --------------------------------------------------
 - [SignatureHelper](https://github.com/oehme/xtend-contrib/blob/master/xtend-contrib/src/main/java/de/oehme/xtend/contrib/SignatureHelper.xtend) simplifies copying methods, e.g. to implement an interface or to add an indirection.
