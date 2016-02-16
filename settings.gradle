@@ -1,1 +1,3 @@
+rootProject.name = 'xtend-contrib-parent'
 include 'xtend-contrib', 'xtend-contrib-examples'
+

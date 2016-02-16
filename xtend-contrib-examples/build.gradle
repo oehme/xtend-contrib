@@ -1,7 +1,13 @@
 plugins {
-	id 'org.xtend.xtend' version '0.4.5'
+	id 'org.xtext.xtend' version '1.0.3'
 }
+
 repositories.jcenter()
+
+sourceSets {
+	main.xtendOutputDir = 'src/main/xtend-gen'
+	test.xtendOutputDir = 'src/test/xtend-gen'
+}
 
 dependencies {
 	compile project(':xtend-contrib')
