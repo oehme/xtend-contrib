@@ -1,20 +1,33 @@
 plugins {
-	id 'org.xtend.xtend' version '0.4.5'
-	id 'com.github.oehme.sobula.bintray-release' version '0.4.1'
-	id 'com.github.oehme.sobula.stefan' version '0.4.1'
+	id 'org.xtend.xtend' version '0.4.14'
+	id 'com.github.oehme.sobula.bintray-release' version '0.6.6'
+	id 'com.github.oehme.sobula.stefan' version '0.6.6'
 }
 
 group = 'com.github.oehme.xtend'
 description = 'Automates well known Java Patterns using Xtend Active Annotations'
 repositories.jcenter()
 
+configurations {
+	provide { description 'additional non-exported dependencies' }
+	providePlusCompile.extendsFrom(compile, provide)
+	testCompile.extendsFrom(providePlusCompile)
+}
+
+sourceSets {
+	main {
+		compileClasspath = project.configurations.providePlusCompile
+	}
+}
+
 dependencies {
-	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.7.3'
+	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.9.1'
 	testCompile 'junit:junit:4.12'
-	testCompile('org.eclipse.xtend:org.eclipse.xtend.core:2.7.3') {
+	testCompile('org.eclipse.xtend:org.eclipse.xtend.core:2.9.1') {
 		exclude group: 'asm', module: 'asm'
 	}
-	testRuntime 'log4j:log4j:1.2.17'
+	// do not export these dependencies.
+	provide 'org.slf4j:slf4j-api:1.7.16'
 }
 
 sourceCompatibility = 1.6
