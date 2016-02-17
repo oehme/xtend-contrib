@@ -1,7 +1,7 @@
 plugins {
-	id 'org.xtend.xtend' version '0.4.5'
-	id 'com.github.oehme.sobula.bintray-release' version '0.4.1'
-	id 'com.github.oehme.sobula.stefan' version '0.4.1'
+	id 'org.xtext.xtend' version '1.0.3'
+	id 'com.github.oehme.sobula.bintray-release' version '0.6.6'
+	id 'com.github.oehme.sobula.stefan' version '0.6.6'
 }
 
 group = 'com.github.oehme.xtend'
@@ -9,12 +9,11 @@ description = 'Automates well known Java Patterns using Xtend Active Annotations
 repositories.jcenter()
 
 dependencies {
-	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.7.3'
+	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.9.1'
 	testCompile 'junit:junit:4.12'
-	testCompile('org.eclipse.xtend:org.eclipse.xtend.core:2.7.3') {
+	testCompile('org.eclipse.xtend:org.eclipse.xtend.core:2.9.1') {
 		exclude group: 'asm', module: 'asm'
 	}
-	testRuntime 'log4j:log4j:1.2.17'
 }
 
 sourceCompatibility = 1.6

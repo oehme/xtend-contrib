@@ -1,1 +1,4 @@
+// de-duplicate project name with subproject, which would be called "xtend-contrib" as well.
+rootProject.name = 'xtend-contrib-parent'
 include 'xtend-contrib', 'xtend-contrib-examples'
+
