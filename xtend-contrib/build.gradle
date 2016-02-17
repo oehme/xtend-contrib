@@ -8,11 +8,6 @@ group = 'com.github.oehme.xtend'
 description = 'Automates well known Java Patterns using Xtend Active Annotations'
 repositories.jcenter()
 
-sourceSets {
-	main.xtendOutputDir = 'src/main/xtend-gen'
-	test.xtendOutputDir = 'src/test/xtend-gen'
-}
-
 dependencies {
 	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.9.1'
 	testCompile 'junit:junit:4.12'

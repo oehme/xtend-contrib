@@ -4,11 +4,6 @@ plugins {
 
 repositories.jcenter()
 
-sourceSets {
-	main.xtendOutputDir = 'src/main/xtend-gen'
-	test.xtendOutputDir = 'src/test/xtend-gen'
-}
-
 dependencies {
 	compile project(':xtend-contrib')
 }
