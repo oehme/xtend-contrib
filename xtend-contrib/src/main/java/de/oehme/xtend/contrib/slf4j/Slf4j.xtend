@@ -1,4 +1,4 @@
-package de.oehme.xtend.contrib.logging
+package de.oehme.xtend.contrib.slf4j
 
 import com.google.common.annotations.Beta
 import java.lang.annotation.Target

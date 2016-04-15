@@ -1,6 +1,6 @@
 package de.oehme.xtend.contrib.examples.logging
 
-import de.oehme.xtend.contrib.logging.Log4j2
+import de.oehme.xtend.contrib.log4j2.Log4j2
 import org.junit.Test
 
 class Log4j2Test extends AbstractLogTest {
