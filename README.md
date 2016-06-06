@@ -68,7 +68,8 @@ Adds a java.util.logging.Logger to your class
     }
 }
 ```
-*If you find this annotation useful, but want to have it for another framework like log4j, please tell me in the issue section.*
+
+Similar annotations for other major logging frameworks are also avaiable.
 
 Convenience classes for writing Active Annotations
 --------------------------------------------------
