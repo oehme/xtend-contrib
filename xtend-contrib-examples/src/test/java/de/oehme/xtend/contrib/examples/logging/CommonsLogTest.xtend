@@ -1,6 +1,6 @@
 package de.oehme.xtend.contrib.examples.logging
 
-import de.oehme.xtend.contrib.commonslog.CommonsLog
+import de.oehme.xtend.contrib.logging.commonslog.CommonsLog
 import org.junit.Test
 
 class CommonsLogTest extends AbstractLogTest {

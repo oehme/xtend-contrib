@@ -1,8 +1,9 @@
-package de.oehme.xtend.contrib.commonslog
+package de.oehme.xtend.contrib.logging.log4j2
 
 import com.google.common.annotations.Beta
 import java.lang.annotation.Target
-import org.apache.commons.logging.LogFactory
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import org.eclipse.xtend.lib.macro.AbstractClassProcessor
 import org.eclipse.xtend.lib.macro.Active
 import org.eclipse.xtend.lib.macro.TransformationContext
@@ -13,19 +14,19 @@ import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
  */
 @Beta
 @Target(TYPE)
-@Active(CommonsLogProcessor)
-annotation CommonsLog {
+@Active(Log4j2Processor)
+annotation Log4j2 {
 }
 
-class CommonsLogProcessor extends AbstractClassProcessor {
+class Log4j2Processor extends AbstractClassProcessor {
 
 	override doTransform(MutableClassDeclaration cls, extension TransformationContext context) {
 		cls.addField("log") [
 			static = true
 			final = true
-			type = org.apache.commons.logging.Log.newTypeReference
+			type = Logger.newTypeReference
 			initializer = '''
-				«LogFactory».getLog("«cls.qualifiedName»")
+				«LogManager».getLogger("«cls.qualifiedName»")
 			'''
 			primarySourceElement = cls
 		]
